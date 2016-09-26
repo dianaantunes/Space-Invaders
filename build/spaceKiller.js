@@ -2,9 +2,23 @@ var camera, scene, renderer;
 var geometry, material, mesh;
 var ball;
 
-var sKillerWidth = 5;
-var sKillerHeight = 5;
-var sKillerDepth = 5;
+// var sKillerWidth = 5;
+// var sKillerHeight = 5;
+// var sKillerDepth = 5;
+
+function makeSKiller(){
+	'use strict'
+
+	var disZ = 0, disY = 0;
+	for (var row = 0; row < 4; row++) {
+        for (var col = 0; col < 4; col++) {
+        	createSKiller(0, disY, disZ);
+			disZ += 15;
+ }
+ disZ = 0;
+ disY += 10;
+}
+}
 
 function createSKiller(x, y, z){
 	'use strict';
@@ -19,9 +33,9 @@ function createSKiller(x, y, z){
 	sKiller.position.y = y;
 	sKiller.position.z = z;
 
-	sKiller.scale.x = sKillerWidth;
-	sKiller.scale.y = sKillerHeight;
-	sKiller.scale.z = sKillerDepth;
+	// sKiller.scale.x = sKillerWidth;
+	// sKiller.scale.y = sKillerHeight;
+	// sKiller.scale.z = sKillerDepth;
 }
 
 function createBody(obj, x, y, z){
@@ -146,7 +160,8 @@ function createScene(){
 
 	scene.add(new THREE.AxisHelper(10));
 
-	createSKiller(0, 0, 0);
+	makeSKiller()
+
 }
 
 function init(){
