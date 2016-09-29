@@ -2,21 +2,24 @@ var camera, scene, renderer;
 var geometry, material, mesh;
 var ball;
 
-// var sKillerWidth = 5;
-// var sKillerHeight = 5;
-// var sKillerDepth = 5;
+var sKillerWidth = 5;
+var sKillerHeight = 5;
+var sKillerDepth = 5;
+
 
 function makeSKiller(){
-	'use strict'
+	'use strict';
 
-	var disZ = 0, disY = 0;
-	for (var row = 0; row < 4; row++) {
-        for (var col = 0; col < 4; col++) {
-        	createSKiller(0, disY, disZ);
-			disZ += 15;
+	// var disX = -120, disY = 120;
+	var disX = 0, disY = 0;
+	for (var row = 0; row < 1; row++) {
+        for (var col = 0; col < 1; col++) {
+        	createSKiller(disX, disY, 0);
+			disX += 60;
  }
- disZ = 0;
- disY += 10;
+ disX = 0;
+ // disX = -120;
+ disY += 50;
 }
 }
 
@@ -24,8 +27,9 @@ function createSKiller(x, y, z){
 	'use strict';
 
 	var sKiller = new THREE.Object3D();
+	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 	
-	createBody(sKiller, 0, 0, 0);
+	createBodySK(sKiller, 0, 0, 0);
 
 	scene.add(sKiller);
 
@@ -33,20 +37,19 @@ function createSKiller(x, y, z){
 	sKiller.position.y = y;
 	sKiller.position.z = z;
 
-	// sKiller.scale.x = sKillerWidth;
-	// sKiller.scale.y = sKillerHeight;
-	// sKiller.scale.z = sKillerDepth;
+	sKiller.scale.x = sKillerWidth;
+	sKiller.scale.y = sKillerHeight;
+	sKiller.scale.z = sKillerDepth;
 }
 
-function createBody(obj, x, y, z){
+function createBodySK(obj, x, y, z){
 	'use strict';
 	var body = new THREE.Object3D();
-	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 
 	addCenterRectangle(body, 0, 0, 0);
 
-	createArm(body, 0, -0.25, 2.5); //Right
-	createArm(body, 0, -0.25, -2.5); //Left
+	createArm(body, 2.5, -0.25, 0); //Right
+	createArm(body, -2.5, -0.25, 0); //Left
 	
 	obj.add(body);
 }
@@ -54,13 +57,12 @@ function createBody(obj, x, y, z){
 function createArm(obj, x, y, z){
 	'use strict';
 	var arm = new THREE.Object3D();
-	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 
-	add1arm(arm, 0, -0.25, 2.5); //Right
-	add1arm(arm, 0, -0.25, -2.5); //Left
+	add1arm(arm, 2.5, -0.25, 0); //Right
+	add1arm(arm, -2.5, -0.25, 0); //Left
 
-	create2Arm(arm, 0, -1, 3.75); //Righ
-	create2Arm(arm, 0, -1, -3.75); //Left
+	create2Arm(arm, 3.75, -1, 0); //Righ
+	create2Arm(arm, -3.75, -1, 0); //Left
 	
 	obj.add(arm);
 }
@@ -68,15 +70,14 @@ function createArm(obj, x, y, z){
 function create2Arm(obj, x, y, z){
 	'use strict';
 	var arm2 = new THREE.Object3D();
-	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 
-	add2arm(arm2, 0, -1, 3.75); //Right
-	add2arm(arm2, 0, -1, -3.75); //Left
+	add2arm(arm2, 3.75, -1, 0); //Right
+	add2arm(arm2, -3.75, -1, 0); //Left
 
-	createFinger(arm2, 0, -2.25, 4.50); 	// RR
-	createFinger(arm2, 0, -2.25, 3);    	// RL
-	createFinger(arm2, 0, -2.25, -3);   	// LR
-	createFinger(arm2, 0, -2.25, -4.50);	// LL
+	createFinger(arm2, 4.50, -2.25, 0); 	// RR
+	createFinger(arm2, 3, -2.25, 0);    	// RL
+	createFinger(arm2, -3, -2.25, 0);   	// LR
+	createFinger(arm2, -4.50, -2.25, 0);	// LL
 	
 	obj.add(arm2);
 }
@@ -84,12 +85,11 @@ function create2Arm(obj, x, y, z){
 function createFinger(obj, x, y, z){
 	'use strict';
 	var finger = new THREE.Object3D();
-	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 
-	addFinger(finger, 0, -2.25, 4.50); 	// RR
-	addFinger(finger, 0, -2.25, 3);    	// RL
-	addFinger(finger, 0, -2.25, -3);   	// LR
-	addFinger(finger, 0, -2.25, -4.50);	// LL
+	addFinger(finger, 4.50, -2.25, 0); 	// RR
+	addFinger(finger, 3, -2.25, 0);    	// RL
+	addFinger(finger, -3, -2.25, 0);   	// LR
+	addFinger(finger, -4.50, -2.25, 0);	// LL
 	
 	obj.add(finger);
 }
@@ -105,7 +105,7 @@ function addCenterRectangle(obj, x, y, z){
 
 function add1arm(obj, x, y, z){
 	'use strict';
-	geometry = new THREE.CubeGeometry(2.5, 1.5, 1.5);
+	geometry = new THREE.CubeGeometry(1.5, 1.5, 2.5);
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 
@@ -114,7 +114,7 @@ function add1arm(obj, x, y, z){
 
 function add2arm(obj, x, y, z){
 	'use strict';
-	geometry = new THREE.CubeGeometry(1.5, 2, 1);
+	geometry = new THREE.CubeGeometry(1, 2, 1.5);
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 
@@ -133,6 +133,11 @@ function addFinger(obj, x, y, z){
 function onResize(){
 	'use strict';
 	renderer.setSize(window.innerWidth, window.innerHeight);
+
+	if (window.innerHeight > 0 && window.innerWidth > 0){
+		camera.aspect = renderer.getSize().width / renderer.getSize().height;
+		camera.updateProjectionMatrix();
+	}
 }
 
 function render(){
@@ -145,7 +150,9 @@ function render(){
 function createCamera(){
 	'use strict';
 
-	camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight , 1, 1000);
+
+	//camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
 	
 	camera.position.x = 50;
 	camera.position.y = 50;
@@ -160,8 +167,25 @@ function createScene(){
 
 	scene.add(new THREE.AxisHelper(10));
 
-	makeSKiller()
+	makeSKiller();
 
+}
+
+function onKeyDown(e){
+	'use strict';
+
+	switch (e.keyCode) {
+		case 65: //A
+		case 97: //a
+			scene.traverse(function(node){
+				if (node instanceof THREE.Mesh){
+					node.material.wireframe = !node.material.wireframe;
+				}
+			});
+			break;
+	}
+
+	render();
 }
 
 function init(){
@@ -179,4 +203,5 @@ function init(){
 	render();
 
 	window.addEventListener("resize", onResize);
+	window.addEventListener("keydown", onKeyDown);
 }

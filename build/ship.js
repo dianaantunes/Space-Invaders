@@ -8,12 +8,35 @@ var shipHeight = 5;
 var shipDepth = 5;
 
 
-const PI = Math.PI
+const PI = Math.PI;
+
+
+function createShip(x, y, z){
+	'use strict';
+	var ship = new THREE.Object3D();
+	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
+
+	createBody(ship, 0, 0, 0);
+	addLeftGun(ship, 6, 0, -2.5);
+	addRightGun(ship, 6, 0, 2.5);
+	addCockpit(ship, 2, 0, 5);
+
+	scene.add(ship);
+
+	ship.position.x = x;
+	ship.position.y = y;
+	ship.position.z = z;
+
+	ship.scale.x = shipWidth;
+	ship.scale.y = shipHeight;
+	ship.scale.z = shipDepth;
+	ship.rotateY(PI/2);
+	ship.rotateZ(PI/2);
+}
 
 function createBody(obj, x, y, z){
 	'use strict';
 	var body = new THREE.Object3D();
-	material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 	
 	addCenterCylinder(body, 0, 0, 0);
 	addUpperCylinder(body, 0, 1, 0);
@@ -79,43 +102,6 @@ function addCockpit(obj, x, y, z){
 	obj.add(mesh);
 }
 
-function createShip(x, y, z){
-	'use strict';
-	var ship = new THREE.Object3D();
-
-	createBody(ship, 0, 0, 0);
-	addLeftGun(ship, 6, 0, -2.5);
-	addRightGun(ship, 6, 0, 2.5);
-	addCockpit(ship, 2, 0, 5);
-
-	scene.add(ship);
-
-	ship.position.x = x;
-	ship.position.y = y;
-	ship.position.z = z;
-
-	ship.scale.x = shipWidth;
-	ship.scale.y = shipHeight;
-	ship.scale.z = shipDepth;
-}
-
-function createCamera(){
-	'use strict';
-	camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-	camera.position.x = 50;
-	camera.position.y = 50;
-	camera.position.z = 50;
-	camera.lookAt(scene.position);
-}
-
-function createScene(){
-	'use strict';
-	scene = new THREE.Scene();
-
-	scene.add(new THREE.AxisHelper(50));
-
-	createShip(0, 0, 0);
-}
 
 function onResize(){
 	'use strict';
@@ -128,6 +114,39 @@ function render() {
 
 }
 
+function createCamera(){
+	'use strict';
+	camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+	//camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+	camera.position.x = 200;
+	camera.position.y = 200;
+	camera.position.z = 200;
+	camera.lookAt(scene.position);
+}
+
+function createScene(){
+	'use strict';
+	scene = new THREE.Scene();
+
+	scene.add(new THREE.AxisHelper(50));
+
+	createShip(0, 0, 0);
+}
+
+function onKeyDown(e){
+	'use strict';
+
+	switch (e.keyCode) {
+		case 65: //A
+		case 97: //a
+			material.wireframe = !material.wireframe;
+				
+			break;
+	}
+
+	render();
+}
+
 function init(){
 	'use strict';
 	renderer = new THREE.WebGLRenderer({antialias: true});
@@ -137,5 +156,6 @@ function init(){
 	createCamera();
 	render();
 	window.addEventListener("resize", onResize);
+	window.addEventListener("keydown", onKeyDown);
 
 }
