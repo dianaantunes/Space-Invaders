@@ -86,6 +86,48 @@ function addCockpit(obj, x, y, z){
 	obj.add(mesh);
 }
 
+function moveShip(ship) {
+
+	var delta;
+	var now;
+	var currentPosition;
+	var currentSpeed;
+	// x = x0 + v0t + (a * t^2) / 2
+	// v = v0 + at
+
+	now = new Date();
+
+	currentPosition = ship.position.x;
+	currentSpeed = ship.speed;
+
+	if (ship.moveStopTime) {
+		delta = now.getTime() - ship.moveStartTime.getTime();
+		currentPosition = ship.position.x;
+		currentSpeed = ship.speed;
+
+		ship.speed = currentSpeed + ship.acceleration * delta;
+		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
+
+		if (ship.speed < 0.01 && ship.speed > -0.01) {
+			ship.speed = 0;
+			ship.acceleration = 0;
+			ship.moveStartTime = null;
+			ship.moveStopTime = null;
+		}
+
+	} else if (ship.moveStartTime){
+
+		delta = now.getTime() - ship.moveStartTime.getTime();
+		currentPosition = ship.position.x;
+		currentSpeed = ship.speed;
+
+		ship.speed = currentSpeed + ship.acceleration * delta;
+		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
+
+	}
+
+}
+
 function createShip(x, y, z){
 	'use strict';
 	ship = new THREE.Object3D();
@@ -93,6 +135,8 @@ function createShip(x, y, z){
 	ship.speed = 0;
     ship.acceleration = 0;
 	ship.moveStartTime = null;
+	ship.moveStopTime = null;
+	ship.move = moveShip;
 
 	createBody(ship, 0, 0, 0);
 	addLeftGun(ship, 6, 0, -2.5);
@@ -305,7 +349,7 @@ function onKeyDown(e){
 		break;
 
 		case 37: // <-
-			ship.acceleration -= 0.000001;
+			ship.acceleration = -0.00001;
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
 			}
@@ -313,7 +357,7 @@ function onKeyDown(e){
 			ship.rotateX(PI/150);
 			break;
 		case 39:  // ->
-			ship.acceleration += 0.000001;
+			ship.acceleration = 0.00001;
 			console.log(39);
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
@@ -328,33 +372,15 @@ function onKeyDown(e){
 function onKeyUp(e){
 	'use strict';
 
-	ship.acceleration = 0;
-	ship.speed = 0;
-	ship.moveStartTime = null;
+	ship.acceleration = -ship.acceleration;
+	ship.moveStopTime = new Date();
 
 }
 
 function animate() {
     'use strict';
 
-	var delta;
-	var now;
-	var currentPosition;
-	var currentSpeed;
-	// x = x0 + v0t + (a * t^2) / 2
-	// v = v0 + at
-
-	now = new Date();
-	if (!ship.moveStartTime) {
-		delta = 0;
-	} else {
-		delta = now.getTime() - ship.moveStartTime.getTime();
-	}
-	currentPosition = ship.position.x;
-	currentSpeed = ship.speed;
-
-	ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta^2) / 2;
-	ship.speed = currentSpeed + ship.acceleration * delta;
+	ship.move(ship);
 	/*
      if (obj.prop.jumping)
          obj..step += 0.04; XXXXXXXX
