@@ -21,7 +21,7 @@ const PI = Math.PI;
 function createBody(obj, x, y, z){
 	'use strict';
 	var body = new THREE.Object3D();
-	
+
 	addCenterCylinder(body, 0, 0, 0);
 	addUpperCylinder(body, 0, 1, 0);
 	addMiddleRectangle(body, 3, 0, 0);
@@ -92,6 +92,7 @@ function createShip(x, y, z){
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
 	ship.speed = 0;
     ship.acceleration = 0;
+	ship.moveStartTime = null;
 
 	createBody(ship, 0, 0, 0);
 	addLeftGun(ship, 6, 0, -2.5);
@@ -133,7 +134,7 @@ function createSKiller(x, y, z){
 	'use strict';
 
 	var sKiller = new THREE.Object3D();
-	
+
 	createBodySK(sKiller, 0, 0, 0);
 
 	scene.add(sKiller);
@@ -155,7 +156,7 @@ function createBodySK(obj, x, y, z){
 
 	createArm(body, 2.5, -0.25, 0); //Right
 	createArm(body, -2.5, -0.25, 0); //Left
-	
+
 	obj.add(body);
 }
 
@@ -169,7 +170,7 @@ function createArm(obj, x, y, z){
 
 	create2Arm(arm, 3.75, -1, 0); //Righ
 	create2Arm(arm, -3.75, -1, 0); //Left
-	
+
 	obj.add(arm);
 }
 
@@ -184,7 +185,7 @@ function create2Arm(obj, x, y, z){
 	createFinger(arm2, 3, -2.25, 0);    	// RL
 	createFinger(arm2, -3, -2.25, 0);   	// LR
 	createFinger(arm2, -4.50, -2.25, 0);	// LL
-	
+
 	obj.add(arm2);
 }
 
@@ -196,7 +197,7 @@ function createFinger(obj, x, y, z){
 	addFinger(finger, 3, -2.25, 0);    	// RL
 	addFinger(finger, -3, -2.25, 0);   	// LR
 	addFinger(finger, -4.50, -2.25, 0);	// LL
-	
+
 	obj.add(finger);
 }
 
@@ -244,7 +245,7 @@ function onResize(){
 		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
 	}
-	
+
 	render();
 }
 
@@ -263,10 +264,10 @@ function render(){
 function createCamera(){
 	'use strict';
 
-	
+
 
 	camera = new THREE.OrthographicCamera( width / -2, width / 2, height * 0.75, height * -0.25, 1, 1000 );
-	
+
 	camera.position.x = 0;
 	camera.position.y = 0;
 	camera.position.z = 70;
@@ -298,41 +299,72 @@ function onKeyDown(e){
 	switch (e.keyCode) {
 		case 65: //A
 		case 97: //a
-
-					materialSKiller.wireframe = !materialSKiller.wireframe;
-					materialShip.wireframe = !materialShip.wireframe;
+			materialSKiller.wireframe = !materialSKiller.wireframe;
+			materialShip.wireframe = !materialShip.wireframe;
 
 		break;
 
 		case 37: // <-
-			ship.position.x -= 10;
+			ship.acceleration -= 0.000001;
+			if (!ship.moveStartTime) {
+				ship.moveStartTime = new Date();
+			}
 			//ship.rotation.z = 0.3
 			ship.rotateX(PI/150);
 			break;
 		case 39:  // ->
-			ship.position.x += 10;
+			ship.acceleration += 0.000001;
+			console.log(39);
+			if (!ship.moveStartTime) {
+				ship.moveStartTime = new Date();
+			}
 			ship.rotateX(-PI/150);
 			//ship.rotation.z = -0.3
 			break;
 	}
-		
+
+}
+
+function onKeyUp(e){
+	'use strict';
+
+	ship.acceleration = 0;
+	ship.speed = 0;
+	ship.moveStartTime = null;
+
 }
 
 function animate() {
     'use strict';
-    
-    render();
-    requestAnimationFrame(animate);
-    
-    /*
+
+	var delta;
+	var now;
+	var currentPosition;
+	var currentSpeed;
+	// x = x0 + v0t + (a * t^2) / 2
+	// v = v0 + at
+
+	now = new Date();
+	if (!ship.moveStartTime) {
+		delta = 0;
+	} else {
+		delta = now.getTime() - ship.moveStartTime.getTime();
+	}
+	currentPosition = ship.position.x;
+	currentSpeed = ship.speed;
+
+	ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta^2) / 2;
+	ship.speed = currentSpeed + ship.acceleration * delta;
+	/*
      if (obj.prop.jumping)
          obj..step += 0.04; XXXXXXXX
-         now = clock();
+         now = Date();
         delta = now - oldClock;
          oldClock = now;
-     
+
      */
-    
+	 render();
+	 requestAnimationFrame(animate);
 }
 
 function init(){
@@ -351,4 +383,5 @@ function init(){
 
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
+	window.addEventListener("keyup", onKeyUp);
 }
