@@ -4,6 +4,9 @@ var ship;
 
 var materialSKiller, materialShip;
 
+var width = 1000;
+var height = 600;
+
 var sKillerWidth = 5;
 var sKillerHeight = 5;
 var sKillerDepth = 5;
@@ -87,7 +90,8 @@ function createShip(x, y, z){
 	'use strict';
 	ship = new THREE.Object3D();
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
-	
+	ship.speed = 0;
+    ship.acceleration = 0;
 
 	createBody(ship, 0, 0, 0);
 	addLeftGun(ship, 6, 0, -2.5);
@@ -237,9 +241,11 @@ function onResize(){
 	renderer.setSize(window.innerWidth, window.innerHeight);
 
 	if (window.innerHeight > 0 && window.innerWidth > 0){
-		camera.aspect = renderer.getSize().width / renderer.getSize().height;
+		camera.aspect = width / height;
 		camera.updateProjectionMatrix();
 	}
+	
+	render();
 }
 
 function render(){
@@ -259,7 +265,7 @@ function createCamera(){
 
 	
 
-	camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 1000 );
+	camera = new THREE.OrthographicCamera( width / -2, width / 2, height * 0.75, height * -0.25, 1, 1000 );
 	
 	camera.position.x = 0;
 	camera.position.y = 0;
@@ -310,8 +316,23 @@ function onKeyDown(e){
 			break;
 	}
 		
+}
 
-	render();
+function animate() {
+    'use strict';
+    
+    render();
+    requestAnimationFrame(animate);
+    
+    /*
+     if (obj.prop.jumping)
+         obj..step += 0.04; XXXXXXXX
+         now = clock();
+        delta = now - oldClock;
+         oldClock = now;
+     
+     */
+    
 }
 
 function init(){
