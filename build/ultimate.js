@@ -4,8 +4,10 @@ var ship;
 
 var materialSKiller, materialShip;
 
-var width = 1000;
-var height = 600;
+//=================// Preciso de sugestoes:
+var width = 1000;  // Nao estou a conseguir fazer com que onResize()
+var height = 600;  // e estas vareaveis se deem bem
+//=================//
 
 var sKillerWidth = 5;
 var sKillerHeight = 5;
@@ -283,14 +285,14 @@ function addFinger(obj, x, y, z){
 
 function onResize(){
 	'use strict';
-	renderer.setSize(window.innerWidth, window.innerHeight);
 
-	if (window.innerHeight > 0 && window.innerWidth > 0){
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
-	}
 
-	render();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.left = window.innerWidth / - 2;
+    camera.right = window.innerWidth / 2;
+    camera.top = window.innerHeight * 0.75;
+    camera.bottom = window.innerHeight * -0.25;
+   	camera.updateProjectionMatrix();
 }
 
 function render(){
@@ -341,10 +343,10 @@ function onKeyDown(e){
 	'use strict';
 
 	switch (e.keyCode) {
-		case 65: //A
-		case 97: //a
-			materialSKiller.wireframe = !materialSKiller.wireframe;
-			materialShip.wireframe = !materialShip.wireframe;
+		case 65: //A     												//Clicar no "a" faz com que a nave nunca mais de para mecher:
+		case 97: //a 													//ultimate.js:106 Uncaught TypeError: Cannot read property 'getTime' of null
+			materialSKiller.wireframe = !materialSKiller.wireframe; 	//Nao sei porque motivo mas isto precisa que meta o render nesta funcao
+			materialShip.wireframe = !materialShip.wireframe;			//Se nao so da para ficar uma fez todo clorido e nao muda mais													
 
 		break;
 
@@ -354,7 +356,7 @@ function onKeyDown(e){
 				ship.moveStartTime = new Date();
 			}
 			//ship.rotation.z = 0.3
-			ship.rotateX(PI/150);
+			// ship.rotateX(PI/150);
 			break;
 		case 39:  // ->
 			ship.acceleration = 0.00001;
@@ -362,11 +364,10 @@ function onKeyDown(e){
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
 			}
-			ship.rotateX(-PI/150);
+			// ship.rotateX(-PI/150);
 			//ship.rotation.z = -0.3
 			break;
 	}
-
 }
 
 function onKeyUp(e){
