@@ -4,10 +4,8 @@ var ship;
 
 var materialSKiller, materialShip;
 
-//=================// Preciso de sugestoes:
-var width = 1000;  // Nao estou a conseguir fazer com que onResize()
-var height = 600;  // e estas vareaveis se deem bem
-//=================//
+var width = 1000; 
+var height = 600; 
 
 var sKillerWidth = 5;
 var sKillerHeight = 5;
@@ -89,7 +87,7 @@ function addCockpit(obj, x, y, z){
 }
 
 function moveShip(ship) {
-
+	'use strict';
 	var delta;
 	var now;
 	var currentPosition;
@@ -102,7 +100,7 @@ function moveShip(ship) {
 	currentPosition = ship.position.x;
 	currentSpeed = ship.speed;
 
-	if (ship.moveStopTime) {
+	if (ship.moveStartTime && ship.moveStopTime) {
 		delta = now.getTime() - ship.moveStartTime.getTime();
 		currentPosition = ship.position.x;
 		currentSpeed = ship.speed;
@@ -288,11 +286,7 @@ function onResize(){
 
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.left = window.innerWidth / - 2;
-    camera.right = window.innerWidth / 2;
-    camera.top = window.innerHeight * 0.75;
-    camera.bottom = window.innerHeight * -0.25;
-   	camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 }
 
 function render(){
@@ -310,19 +304,11 @@ function render(){
 function createCamera(){
 	'use strict';
 
-
-
 	camera = new THREE.OrthographicCamera( width / -2, width / 2, height * 0.75, height * -0.25, 1, 1000 );
 
 	camera.position.x = 0;
 	camera.position.y = 0;
 	camera.position.z = 70;
-
-	// camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight , 1, 1000);
-
-	// camera.position.x = 0;
-	// camera.position.y = -250;
-	// camera.position.z = 400;
 
 	camera.lookAt(scene.position);
 }
@@ -344,11 +330,10 @@ function onKeyDown(e){
 
 	switch (e.keyCode) {
 		case 65: //A     												//Clicar no "a" faz com que a nave nunca mais de para mecher:
-		case 97: //a 													//ultimate.js:106 Uncaught TypeError: Cannot read property 'getTime' of null
-			materialSKiller.wireframe = !materialSKiller.wireframe; 	//Nao sei porque motivo mas isto precisa que meta o render nesta funcao
-			materialShip.wireframe = !materialShip.wireframe;			//Se nao so da para ficar uma fez todo clorido e nao muda mais													
-
-		break;
+		case 97: //a
+			materialSKiller.wireframe = !materialSKiller.wireframe;
+			materialShip.wireframe = !materialShip.wireframe;				
+			break;
 
 		case 37: // <-
 			ship.acceleration = -0.00001;
@@ -360,7 +345,6 @@ function onKeyDown(e){
 			break;
 		case 39:  // ->
 			ship.acceleration = 0.00001;
-			console.log(39);
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
 			}
@@ -400,7 +384,7 @@ function init(){
 	renderer = new THREE.WebGLRenderer({ antialias: true});
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-
+	renderer.setPixelRatio( width / height );
 	document.body.appendChild(renderer.domElement);
 
 	createScene();
