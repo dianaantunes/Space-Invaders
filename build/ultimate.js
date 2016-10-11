@@ -18,6 +18,10 @@ var shipDepth = 5;
 
 const PI = Math.PI;
 
+/*==========================================================================================================
+	Ship code
+============================================================================================================*/
+
 function createBody(obj, x, y, z){
 	'use strict';
 	var body = new THREE.Object3D();
@@ -156,41 +160,9 @@ function createShip(x, y, z){
 	ship.rotateZ(PI/2);
 }
 
-
-function makeSKiller(){
-	'use strict';
-
-	var disX = -120, disY = 120;
-
-	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
-
-	for (var row = 0; row < 5; row++) {
-        for (var col = 0; col < 5; col++) {
-        	createSKiller(disX, disY, 0);
-			disX += 60;
- }
- disX = -120;
- disY += 50;
-}
-}
-
-function createSKiller(x, y, z){
-	'use strict';
-
-	var sKiller = new THREE.Object3D();
-
-	createBodySK(sKiller, 0, 0, 0);
-
-	scene.add(sKiller);
-
-	sKiller.position.x = x;
-	sKiller.position.y = y;
-	sKiller.position.z = z;
-
-	sKiller.scale.x = sKillerWidth;
-	sKiller.scale.y = sKillerHeight;
-	sKiller.scale.z = sKillerDepth;
-}
+/*==========================================================================================================
+	Space Killer code
+============================================================================================================*/
 
 function createBodySK(obj, x, y, z){
 	'use strict';
@@ -281,6 +253,45 @@ function addFinger(obj, x, y, z){
 	obj.add(mesh);
 }
 
+function createSKiller(x, y, z){
+	'use strict';
+
+	var sKiller = new THREE.Object3D();
+
+	createBodySK(sKiller, 0, 0, 0);
+
+	scene.add(sKiller);
+
+	sKiller.position.x = x;
+	sKiller.position.y = y;
+	sKiller.position.z = z;
+
+	sKiller.scale.x = sKillerWidth;
+	sKiller.scale.y = sKillerHeight;
+	sKiller.scale.z = sKillerDepth;
+}
+
+function makeSKiller(){
+	'use strict';
+
+	var disX = -120, disY = 120;
+
+	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
+
+	for (var row = 0; row < 5; row++) {
+        for (var col = 0; col < 5; col++) {
+        	createSKiller(disX, disY, 0);
+			disX += 60;
+ 		}
+ 		disX = -120;
+ 		disY += 50;
+	}
+}
+
+/*==========================================================================================================
+	Funcional code
+============================================================================================================*/
+
 function onResize(){
 	'use strict';
 
@@ -329,7 +340,7 @@ function onKeyDown(e){
 	'use strict';
 
 	switch (e.keyCode) {
-		case 65: //A     												//Clicar no "a" faz com que a nave nunca mais de para mecher:
+		case 65: //A     												
 		case 97: //a
 			materialSKiller.wireframe = !materialSKiller.wireframe;
 			materialShip.wireframe = !materialShip.wireframe;				
@@ -356,10 +367,13 @@ function onKeyDown(e){
 
 function onKeyUp(e){
 	'use strict';
-
-	ship.acceleration = -ship.acceleration;
-	ship.moveStopTime = new Date();
-
+	switch (e.keyCode){
+		case 37:
+		case 39:
+			ship.acceleration = -ship.acceleration;
+			ship.moveStopTime = new Date();
+			break;
+	}
 }
 
 function animate() {
