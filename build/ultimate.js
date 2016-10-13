@@ -92,6 +92,7 @@ function addCockpit(obj, x, y, z){
 	obj.add(mesh);
 }
 
+//ship's movement
 function moveShip(ship) {
 	'use strict';
 	var delta;
@@ -356,6 +357,8 @@ function createScene(){
 	createShip(0,0,0);
 
 }
+
+//Keyboard events Reading
 
 function onKeyDown(e){
 	'use strict';
