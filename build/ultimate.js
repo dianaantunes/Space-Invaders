@@ -114,14 +114,17 @@ function moveShip(ship) {
 		ship.speed = currentSpeed + ship.acceleration * delta;
 		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
+		maxSpeed(currentSpeed);
+
 		if (ship.speed < 0.01 && ship.speed > -0.01) {
 			ship.speed = 0;
 			ship.acceleration = 0;
 			ship.moveStartTime = null;
 			ship.moveStopTime = null;
-		}
 
-	} else if (ship.moveStartTime){
+		}
+	} 
+	else if (ship.moveStartTime){
 
 		delta = now.getTime() - ship.moveStartTime.getTime();
 		currentPosition = ship.position.x;
@@ -130,8 +133,18 @@ function moveShip(ship) {
 			ship.speed = currentSpeed + ship.acceleration * delta;
 			ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
-	}
+			maxSpeed(currentSpeed);
 
+	}
+}
+
+function maxSpeed(speed){
+	if(speed > 5)
+		ship.speed = 5;
+	else if(speed < -5)
+		ship.speed = -5;
+	else
+		ship.speed = speed;
 }
 
 function createShip(x, y, z){
