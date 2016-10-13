@@ -4,6 +4,8 @@ var ship;
 
 var materialSKiller, materialShip;
 
+var aspectRatio, viewSize;
+
 var width = 1000; 
 var height = 600; 
 
@@ -124,9 +126,9 @@ function moveShip(ship) {
 		delta = now.getTime() - ship.moveStartTime.getTime();
 		currentPosition = ship.position.x;
 		currentSpeed = ship.speed;
-
-		ship.speed = currentSpeed + ship.acceleration * delta;
-		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
+		
+			ship.speed = currentSpeed + ship.acceleration * delta;
+			ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
 	}
 
@@ -297,6 +299,16 @@ function onResize(){
 
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    aspectRatio = window.innerWidth/window.innerHeight;
+
+    camera.left = aspectRatio * viewSize / -2;
+    camera.right = aspectRatio * viewSize / 2;
+    camera.top = viewSize * 0.75;
+    camera.bottom = viewSize * -0.25;
+
+
+
     camera.updateProjectionMatrix();
 }
 
@@ -315,8 +327,10 @@ function render(){
 function createCamera(){
 	'use strict';
 
-	camera = new THREE.OrthographicCamera( width / -2, width / 2, height * 0.75, height * -0.25, 1, 1000 );
+	viewSize = 900;
+	aspectRatio = window.innerWidth/window.innerHeight;
 
+	camera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2, aspectRatio*viewSize / 2, viewSize * 0.75, viewSize * -0.25, 1, 1000 );
 	camera.position.x = 0;
 	camera.position.y = 0;
 	camera.position.z = 70;
