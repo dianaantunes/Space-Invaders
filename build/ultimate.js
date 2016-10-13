@@ -6,8 +6,8 @@ var materialSKiller, materialShip;
 
 var aspectRatio, viewSize;
 
-var width = 1000; 
-var height = 600; 
+var width = 1000;
+var height = 600;
 
 var sKillerWidth = 5;
 var sKillerHeight = 5;
@@ -106,6 +106,7 @@ function moveShip(ship) {
 	currentPosition = ship.position.x;
 	currentSpeed = ship.speed;
 
+	maxSpeed();
 	if (ship.moveStartTime && ship.moveStopTime) {
 		delta = now.getTime() - ship.moveStartTime.getTime();
 		currentPosition = ship.position.x;
@@ -114,8 +115,6 @@ function moveShip(ship) {
 		ship.speed = currentSpeed + ship.acceleration * delta;
 		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
-		maxSpeed(currentSpeed);
-
 		if (ship.speed < 0.01 && ship.speed > -0.01) {
 			ship.speed = 0;
 			ship.acceleration = 0;
@@ -123,28 +122,23 @@ function moveShip(ship) {
 			ship.moveStopTime = null;
 
 		}
-	} 
+	}
 	else if (ship.moveStartTime){
 
 		delta = now.getTime() - ship.moveStartTime.getTime();
 		currentPosition = ship.position.x;
 		currentSpeed = ship.speed;
-		
-			ship.speed = currentSpeed + ship.acceleration * delta;
-			ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
-			maxSpeed(currentSpeed);
+		ship.speed = currentSpeed + ship.acceleration * delta;
+		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
 	}
+	maxSpeed();
 }
 
-function maxSpeed(speed){
-	if(speed > 5)
-		ship.speed = 5;
-	else if(speed < -5)
-		ship.speed = -5;
-	else
-		ship.speed = speed;
+function maxSpeed(){
+	if(ship.speed > 0.02) ship.speed = 0.02;
+	else if(ship.speed < -0.02) ship.speed = -0.02;
 }
 
 function createShip(x, y, z){
@@ -367,10 +361,10 @@ function onKeyDown(e){
 	'use strict';
 
 	switch (e.keyCode) {
-		case 65: //A     												
+		case 65: //A
 		case 97: //a
 			materialSKiller.wireframe = !materialSKiller.wireframe;
-			materialShip.wireframe = !materialShip.wireframe;				
+			materialShip.wireframe = !materialShip.wireframe;
 			break;
 
 		case 37: // <-
