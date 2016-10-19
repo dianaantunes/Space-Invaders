@@ -1,4 +1,5 @@
-var camera, scene, renderer;
+var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2;
+var scene, renderer;
 var geometry, mesh;
 var ship;
 
@@ -17,8 +18,20 @@ var shipWidth = 5;
 var shipHeight = 5;
 var shipDepth = 5;
 
-
 const PI = Math.PI;
+
+/*==========================================================================================================
+	Math code
+============================================================================================================*/
+
+function getRandomSpeed() {
+
+	var possibleSpeeds = [0.01, -0.01];
+	var index = Math.floor((Math.random() * 2));
+
+
+	return possibleSpeeds[index];
+}
 
 /*==========================================================================================================
 	Ship code
@@ -134,6 +147,9 @@ function moveShip(ship) {
 		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
 
 	}
+
+	perspectiveCamera1.position.x = ship.position.x;
+
 	maxSpeed();
 }
 
@@ -279,6 +295,14 @@ function createSKiller(x, y, z){
 	sKiller.scale.x = sKillerWidth;
 	sKiller.scale.y = sKillerHeight;
 	sKiller.scale.z = sKillerDepth;
+
+	sKiller.speedX = getRandomSpeed();
+	sKiller.speedY = getRandomSpeed();
+	sKiller.t = null;
+	sKiller.name = "sKiller";
+
+	sKiller.move = moveSKiller;
+
 }
 
 function makeSKiller(){
@@ -298,6 +322,22 @@ function makeSKiller(){
 	}
 }
 
+function moveSKiller(sKiller) {
+
+	var delta;
+
+	sKiller.now = new Date().getTime();
+	if(sKiller.t) {
+		delta = sKiller.now - sKiller.t;
+		sKiller.position.x += sKiller.speedX * delta;
+		sKiller.position.y += sKiller.speedY * delta;
+		sKiller.t = sKiller.now;
+	} else {
+		sKiller.t = sKiller.now;
+	}
+
+}
+
 /*==========================================================================================================
 	Funcional code
 ============================================================================================================*/
@@ -305,45 +345,63 @@ function makeSKiller(){
 function onResize(){
 	'use strict';
 
-
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     aspectRatio = window.innerWidth/window.innerHeight;
 
-    camera.left = aspectRatio * viewSize / -2;
-    camera.right = aspectRatio * viewSize / 2;
-    camera.top = viewSize * 0.75;
-    camera.bottom = viewSize * -0.25;
+    ortographicCamera.left = aspectRatio * viewSize / -2;
+    ortographicCamera.right = aspectRatio * viewSize / 2;
+    ortographicCamera.top = viewSize * 0.75;
+    ortographicCamera.bottom = viewSize * -0.25;
 
 
 
-    camera.updateProjectionMatrix();
+    ortographicCamera.updateProjectionMatrix();
 }
 
 function render(){
 	'use strict';
 
-	// requestAnimationFrame( render );
-
-	// cube.rotation.x += 0.1;
-	// cube.rotation.y += 0.1;
-
-	renderer.render(scene, camera);
-
+	renderer.render(scene, currentCamera);
 }
 
-function createCamera(){
+function createOrtographicCamera(){
 	'use strict';
 
 	viewSize = 900;
 	aspectRatio = window.innerWidth/window.innerHeight;
 
-	camera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2, aspectRatio*viewSize / 2, viewSize * 0.75, viewSize * -0.25, 1, 1000 );
-	camera.position.x = 0;
-	camera.position.y = 0;
-	camera.position.z = 70;
+	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2, aspectRatio*viewSize / 2, viewSize * 0.75, viewSize * -0.25, 1, 1000 );
 
-	camera.lookAt(scene.position);
+	ortographicCamera.position.x = 0;
+	ortographicCamera.position.y = 0;
+	ortographicCamera.position.z = 50;
+
+	ortographicCamera.lookAt(scene.position);
+}
+
+function createPerspectiveCamera1() {
+	'use strict';
+
+	perspectiveCamera1 = new THREE.PerspectiveCamera(70, aspectRatio, 1, 1000);
+
+	perspectiveCamera1.position.x = 0;
+	perspectiveCamera1.position.y = -70;
+	perspectiveCamera1.position.z = 0;
+
+	perspectiveCamera1.lookAt(ship.position);
+}
+
+function createPerspectiveCamera2() {
+	'use strict';
+
+	perspectiveCamera2 = new THREE.PerspectiveCamera(70, aspectRatio, 1, 1000);
+
+	perspectiveCamera2.position.x = 0;
+	perspectiveCamera2.position.y = -70;
+	perspectiveCamera2.position.z = 0;
+
+	perspectiveCamera2.lookAt(ship.position);
 }
 
 function createScene(){
@@ -386,6 +444,15 @@ function onKeyDown(e){
 			// ship.rotateX(-PI/150);
 			//ship.rotation.z = -0.3
 			break;
+		case 49: // 1
+			currentCamera = ortographicCamera;
+			break;
+		case 50: // 2
+			currentCamera = perspectiveCamera1;
+			break;
+		case 51: // 3
+			currentCamera = perspectiveCamera2;
+			break;
 	}
 }
 
@@ -404,16 +471,14 @@ function animate() {
     'use strict';
 
 	ship.move(ship);
-	/*
-     if (obj.prop.jumping)
-         obj..step += 0.04; XXXXXXXX
-         now = Date();
-        delta = now - oldClock;
-         oldClock = now;
+	scene.traverse(function (node) {
+		if (node instanceof THREE.Object3D && node.name == "sKiller") {
+			node.move(node);
+		}
+	})
 
-     */
-	 render();
-	 requestAnimationFrame(animate);
+	render();
+	requestAnimationFrame(animate);
 }
 
 function init(){
@@ -422,13 +487,17 @@ function init(){
 	renderer = new THREE.WebGLRenderer({ antialias: true});
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setPixelRatio( width / height );
 	document.body.appendChild(renderer.domElement);
 
 	createScene();
-	createCamera();
+	createOrtographicCamera();
+	createPerspectiveCamera1();
+	createPerspectiveCamera2();
+
+	currentCamera = ortographicCamera;
 
 	render();
+	animate();
 
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
