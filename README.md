@@ -1,10 +1,12 @@
 ### computer-graphics
 ##Projeto de CG
 
-*Nuno* - Faz esboço de invaders e cria 1 invader. (Até Domingo)
+*Nuno* - Faz tiros
 
-*Diana* - Faz esboço da nave e cria 1 nave. (Até Domingo)
+*Diana* - Faz detectColision atraves de esferas
 
-*Eduardo* - Distribui no tabuleiro os invaders do Nuno e poe a nave da Diana no sitio (Até à segunda aula)
+*Eduardo* - Cria classe movable e faz herança
 
-Juntos pomos a nave a mexer em linha reta na aula
+Calculo de velocidade é so num objeto:
+Superclase "movable" tem velocidade, aceleraçao, funcao move, funcao detectColision.
+Nave, aliens, tiro derivam dessa classe	
