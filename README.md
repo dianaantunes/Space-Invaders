@@ -1,7 +1,7 @@
 ### computer-graphics
 ##Projeto de CG
 
-*Nuno* - Faz tiros
+*Nuno* - Faz tiros (NÃO CONTINUOS)
 
 *Diana* - Faz detectColision atraves de esferas
 
