@@ -61,13 +61,13 @@ var Movable = function(x, y, z, speedX, speedY, acceleration) {
 	this.accelerationY = 0;
 };
 
-// Create a Ship.prototype object that inherits from Movable.prototype.
-// Note: A common error here is to use "new Movable()" to create the
-// Ship.prototyoe. The correct place to call Movable is above, where we call
-// it from Ship.
+// Create a Movable.prototype object that inherits from Object3D.prototype.
+// Note: A common error here is to use "new Object3D()" to create the
+// Movable.prototype. The correct place to call Object3D is above, where we call
+// it from Movable.
 Movable.prototype = Object.create(THREE.Object3D.prototype);
 
-// Set the constructor properly to refer to Student
+// Set the constructor properly to refer to Movable
 Movable.prototype.constructor = Movable;
 
 // We add a couple of methods
@@ -225,12 +225,9 @@ function Ship(x, y, z) {
 }
 
 // Create a Ship.prototype object that inherits from Movable.prototype.
-// Note: A common error here is to use "new Movable()" to create the
-// Ship.prototyoe. The correct place to call Movable is above, where we call
-// it from Ship.
 Ship.prototype = Object.create(Movable.prototype);
 
-// Set the constructor properly to refer to Student
+// Set the constructor properly to refer to Ship
 Ship.prototype.constructor = Ship;
 
 /*==========================================================================================================
@@ -343,9 +340,6 @@ function SKiller(x, y, z) {
 }
 
 // Create a SKiller.prototype object that inherits from Movable.prototype.
-// Note: A common error here is to use "new Movable()" to create the
-// SKiller.prototyoe. The correct place to call Movable is above, where we call
-// it from SKiller.
 SKiller.prototype = Object.create(Movable.prototype);
 
 // Set the constructor properly to refer to SKiller
@@ -361,7 +355,6 @@ function makeSKiller(){
 	for (var row = 0; row < 5; row++) {
         for (var col = 0; col < 5; col++) {
         	new SKiller(disX, disY, 0);
-			// Initialize our Ship specific properties
 			disX += 60;
  		}
  		disX = -120;
