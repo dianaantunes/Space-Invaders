@@ -1,15 +1,14 @@
-
 /*===========================================================================================================
 #   2ª Entrega  -  28/10
-#	
+#
 #   Calculo de velocidade é so num objeto:
 #   Superclase "movable" tem velocidade, aceleraçao, funcao move, funcao detectColision.
-#   Nave, aliens, tiro derivam dessa classe	
-#	
+#   Nave, aliens, tiro derivam dessa classe
+#
 #   Colisão detetada por esfera
-#	
-#	
-#	
+#
+#
+#
 ============================================================================================================*/
 
 var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2;
@@ -39,11 +38,98 @@ const PI = Math.PI;
 ============================================================================================================*/
 
 function getRandomSpeed() {
-    // Tottaly random between [-0.01, 0.01]
-	return Math.random() * 0.02 - 0.01;
+    // Tottaly random between [-0.0001, 0.0001]
+	return Math.random() * 0.0002 - 0.0001;
+}
+
+
+/*==========================================================================================================
+	Movable superclass
+============================================================================================================*/
+
+// We define classes as functions
+var Movable = function(x, y, z, speedX, speedY, acceleration) {
+	THREE.Object3D.call(this);
+	this.moveStartTime = null;
+	this.moveStopTime = null;
+	this.position.x = x;
+	this.position.y = y;
+	this.position.z = z;
+	this.speedX = speedX;
+	this.speedY = speedY;
+	this.accelerationX = acceleration;
+	this.accelerationY = 0;
+};
+
+// Create a Ship.prototype object that inherits from Movable.prototype.
+// Note: A common error here is to use "new Movable()" to create the
+// Ship.prototyoe. The correct place to call Movable is above, where we call
+// it from Ship.
+Movable.prototype = Object.create(THREE.Object3D.prototype);
+
+// Set the constructor properly to refer to Student
+Movable.prototype.constructor = Movable;
+
+// We add a couple of methods
+Movable.prototype.move = function() {
+
+	'use strict';
+	var delta;
+	var now;
+	var currentPositionX;
+	var currentPositionY;
+	var currentSpeedX;
+	var currentSpeedY;
+	// x = x0 + v0t + (a * t^2) / 2
+	// v = v0 + at
+
+	now = new Date().getTime();
+
+	currentPositionX = this.position.x;
+	currentPositionY = this.position.y;
+	currentSpeedX = this.speedX;
+	currentSpeedY = this.speedY;
+
+	maxSpeed();
+
+	if (this.moveStartTime && this.moveStopTime) {
+
+		delta = now - this.moveStartTime.getTime();
+		this.speedX = currentSpeedX + this.accelerationX * delta;
+		this.speedY = currentSpeedY + this.accelerationY * delta;
+		this.position.x = currentPositionX + this.speedX * delta + (this.accelerationX * delta) / 4;
+		this.position.y = currentPositionY + this.speedY * delta + (this.accelerationY * delta) / 4;
+
+		if (this.speedX < 0.01 && this.speedX > -0.01) {
+			this.speedX = 0;
+			this.accelerationX = 0;
+			this.moveStartTime = null;
+			this.moveStopTime = null;
+		}
+	}
+	else if (this.moveStartTime){
+
+		delta = now - this.moveStartTime.getTime();
+		this.position.x = currentPositionX + this.speedX * delta + (this.accelerationX * delta) / 4;
+		this.position.y = currentPositionY + this.speedY * delta + (this.accelerationY * delta) / 4;
+		this.speedX = currentSpeedX + this.accelerationX * delta;
+		this.speedY = currentSpeedY + this.accelerationY * delta;
+	}
+
+	maxSpeed();
+}
+
+Movable.prototype.detectColision = function() {
+	// TODO
+}
+
+function maxSpeed(){
+	if(ship.speedX > 0.02) ship.speedX = 0.02;
+	else if(ship.speedX < -0.02) ship.speedX = -0.02;
 }
 
 /*==========================================================================================================
+
 	Ship code
 ============================================================================================================*/
 
@@ -115,86 +201,37 @@ function addCockpit(obj, x, y, z){
 	obj.add(mesh);
 }
 
-//ship's movement
-function moveShip(ship) {
-	'use strict';
-	var delta;
-	var now;
-	var currentPosition;
-	var currentSpeed;
-	// x = x0 + v0t + (a * t^2) / 2
-	// v = v0 + at
+// Define the Ship constructor
+function Ship(x, y, z) {
+	// Call the parent constructor, making sure (using call)
+	// that "this" is ser correctly during the call
+	Movable.call(this, x, y, z, 0, 0, 0);
 
-	now = new Date();
-
-	currentPosition = ship.position.x;
-	currentSpeed = ship.speed;
-
-	maxSpeed();
-	if (ship.moveStartTime && ship.moveStopTime) {
-		delta = now.getTime() - ship.moveStartTime.getTime();
-		currentPosition = ship.position.x;
-		currentSpeed = ship.speed;
-
-		ship.speed = currentSpeed + ship.acceleration * delta;
-		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
-
-		if (ship.speed < 0.01 && ship.speed > -0.01) {
-			ship.speed = 0;
-			ship.acceleration = 0;
-			ship.moveStartTime = null;
-			ship.moveStopTime = null;
-
-		}
-	}
-	else if (ship.moveStartTime){
-
-		delta = now.getTime() - ship.moveStartTime.getTime();
-		currentPosition = ship.position.x;
-		currentSpeed = ship.speed;
-
-		ship.speed = currentSpeed + ship.acceleration * delta;
-		ship.position.x = currentPosition + ship.speed * delta + (ship.acceleration * delta) / 4;
-
-	}
-
-	perspectiveCamera1.position.x = ship.position.x;
-
-	maxSpeed();
-}
-
-function maxSpeed(){
-	if(ship.speed > 0.02) ship.speed = 0.02;
-	else if(ship.speed < -0.02) ship.speed = -0.02;
-}
-
-function createShip(x, y, z){
-	'use strict';
-	ship = new THREE.Object3D();
+	// Initialize our Ship specific properties
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
-	ship.speed = 0;
-    ship.acceleration = 0;
-	ship.moveStartTime = null;
-	ship.moveStopTime = null;
-	ship.move = moveShip;
 
-	createBody(ship, 0, 0, 0);
-	addLeftGun(ship, 6, 0, -2.5);
-	addRightGun(ship, 6, 0, 2.5);
-	addCockpit(ship, 2, 0, 5);
+	createBody(this, 0, 0, 0);
+	addLeftGun(this, 6, 0, -2.5);
+	addRightGun(this, 6, 0, 2.5);
+	addCockpit(this, 2, 0, 5);
 
-	scene.add(ship);
+	this.scale.x = shipWidth;
+	this.scale.y = shipHeight;
+	this.scale.z = shipDepth;
+	this.rotateY(PI/2);
+	this.rotateZ(PI/2);
 
-	ship.position.x = x;
-	ship.position.y = y;
-	ship.position.z = z;
-
-	ship.scale.x = shipWidth;
-	ship.scale.y = shipHeight;
-	ship.scale.z = shipDepth;
-	ship.rotateY(PI/2);
-	ship.rotateZ(PI/2);
+	scene.add(this);
 }
+
+// Create a Ship.prototype object that inherits from Movable.prototype.
+// Note: A common error here is to use "new Movable()" to create the
+// Ship.prototyoe. The correct place to call Movable is above, where we call
+// it from Ship.
+Ship.prototype = Object.create(Movable.prototype);
+
+// Set the constructor properly to refer to Student
+Ship.prototype.constructor = Ship;
 
 /*==========================================================================================================
 	Space Killer code
@@ -289,31 +326,30 @@ function addFinger(obj, x, y, z){
 	obj.add(mesh);
 }
 
-function createSKiller(x, y, z){
-	'use strict';
 
-	var sKiller = new THREE.Object3D();
+// Define the Ship constructor
+function SKiller(x, y, z) {
+	// Call the parent constructor, making sure (using call)
+	// that "this" is ser correctly during the call
+	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0);
 
-	createBodySK(sKiller, 0, 0, 0);
+	createBodySK(this, 0, 0, 0);
+	this.scale.x = sKillerWidth;
+	this.scale.y = sKillerHeight;
+	this.scale.z = sKillerDepth;
 
-	scene.add(sKiller);
-
-	sKiller.position.x = x;
-	sKiller.position.y = y;
-	sKiller.position.z = z;
-
-	sKiller.scale.x = sKillerWidth;
-	sKiller.scale.y = sKillerHeight;
-	sKiller.scale.z = sKillerDepth;
-
-	sKiller.speedX = getRandomSpeed();
-	sKiller.speedY = getRandomSpeed();
-	sKiller.t = null;
-	sKiller.name = "sKiller";
-
-	sKiller.move = moveSKiller;
-
+	this.moveStartTime = new Date();
+	scene.add(this);
 }
+
+// Create a SKiller.prototype object that inherits from Movable.prototype.
+// Note: A common error here is to use "new Movable()" to create the
+// SKiller.prototyoe. The correct place to call Movable is above, where we call
+// it from SKiller.
+SKiller.prototype = Object.create(Movable.prototype);
+
+// Set the constructor properly to refer to SKiller
+SKiller.prototype.constructor = SKiller;
 
 function makeSKiller(){
 	'use strict';
@@ -324,28 +360,13 @@ function makeSKiller(){
 
 	for (var row = 0; row < 5; row++) {
         for (var col = 0; col < 5; col++) {
-        	createSKiller(disX, disY, 0);
+        	new SKiller(disX, disY, 0);
+			// Initialize our Ship specific properties
 			disX += 60;
  		}
  		disX = -120;
  		disY += 50;
 	}
-}
-
-function moveSKiller(sKiller) {
-
-	var delta;
-
-	sKiller.now = new Date().getTime();
-	if(sKiller.t) {
-		delta = sKiller.now - sKiller.t;
-		sKiller.position.x += sKiller.speedX * delta;
-		sKiller.position.y += sKiller.speedY * delta;
-		sKiller.t = sKiller.now;
-	} else {
-		sKiller.t = sKiller.now;
-	}
-
 }
 
 /*==========================================================================================================
@@ -363,8 +384,6 @@ function onResize(){
     ortographicCamera.right = aspectRatio * viewSize / 2;
     ortographicCamera.top = viewSize * 0.75;
     ortographicCamera.bottom = viewSize * -0.25;
-
-
 
     ortographicCamera.updateProjectionMatrix();
 }
@@ -422,7 +441,7 @@ function createScene(){
 	scene.add(new THREE.AxisHelper(10));
 
 	makeSKiller();
-	createShip(0,0,0);
+	ship = new Ship(0,0,0);
 
 }
 
@@ -439,7 +458,7 @@ function onKeyDown(e){
 			break;
 
 		case 37: // <-
-			ship.acceleration = -0.00001;
+			ship.accelerationX = -0.00001;
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
 			}
@@ -447,7 +466,7 @@ function onKeyDown(e){
 			// ship.rotateX(PI/150);
 			break;
 		case 39:  // ->
-			ship.acceleration = 0.00001;
+			ship.accelerationX = 0.00001;
 			if (!ship.moveStartTime) {
 				ship.moveStartTime = new Date();
 			}
@@ -471,7 +490,7 @@ function onKeyUp(e){
 	switch (e.keyCode){
 		case 37:
 		case 39:
-			ship.acceleration = -ship.acceleration;
+			ship.accelerationX = -ship.accelerationX;
 			ship.moveStopTime = new Date();
 			break;
 	}
@@ -480,10 +499,11 @@ function onKeyUp(e){
 function animate() {
     'use strict';
 
-	ship.move(ship);
+	ship.move();
+	perspectiveCamera1.position.x = ship.position.x;
 	scene.traverse(function (node) {
-		if (node instanceof THREE.Object3D && node.name == "sKiller") {
-			node.move(node);
+		if (node instanceof SKiller) {
+			node.move();
 		}
 	})
 
