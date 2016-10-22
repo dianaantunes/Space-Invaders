@@ -14,9 +14,9 @@
 var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2;
 var scene, renderer;
 var geometry, mesh;
-var ship;
+var ship, bullet;
 
-var materialSKiller, materialShip;
+var materialSKiller, materialShip, materialBullet;
 
 var aspectRatio, viewSize;
 
@@ -30,6 +30,10 @@ var sKillerDepth = 5;
 var shipWidth = 5;
 var shipHeight = 5;
 var shipDepth = 5;
+
+var bulletWidth = 5;
+var bulletHeight = 5;
+var bulletDepth = 5;
 
 const PI = Math.PI;
 
@@ -363,6 +367,48 @@ function makeSKiller(){
 }
 
 /*==========================================================================================================
+	Bullet code
+============================================================================================================*/
+
+function Bullet(x, y, z) {
+
+	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0);
+
+	materialBullet = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+	createBodyBullet(this, 0, 0, 0);
+	this.scale.x = bulletWidth;
+	this.scale.y = bulletHeight;
+	this.scale.z = bulletDepth;
+
+	scene.add(this);
+}
+
+function createBodyBullet(obj, x, y, z){
+	'use strict';
+	var body = new THREE.Object3D();
+
+	addBulletCylinder(body, 0, 0, 0);
+
+	obj.add(body);
+}
+
+function addBulletCylinder(obj, x, y, z){
+	'use strict';
+	geometry = new THREE.CylinderGeometry(0.5, 0.5, 3.5, 32);
+	mesh = new THREE.Mesh(geometry, materialBullet);
+	mesh.position.set(x, y, z);
+
+	obj.add(mesh);
+}
+
+// Create a Bullet.prototype object that inherits from Movable.prototype.
+Bullet.prototype = Object.create(Movable.prototype);
+
+// Set the constructor properly to refer to Bullet
+Bullet.prototype.constructor = Bullet;
+
+/*==========================================================================================================
 	Funcional code
 ============================================================================================================*/
 
@@ -435,6 +481,7 @@ function createScene(){
 
 	makeSKiller();
 	ship = new Ship(0,0,0);
+	bullet = new Bullet(0,0,0);
 
 }
 
@@ -448,6 +495,7 @@ function onKeyDown(e){
 		case 97: //a
 			materialSKiller.wireframe = !materialSKiller.wireframe;
 			materialShip.wireframe = !materialShip.wireframe;
+			materialBullet.wireframe = !materialBullet.wireframe;
 			break;
 
 		case 37: // <-
@@ -466,6 +514,14 @@ function onKeyDown(e){
 			// ship.rotateX(-PI/150);
 			//ship.rotation.z = -0.3
 			break;
+
+		case 32: // space
+			bullet.accelerationX = 0.00001;
+			if (!bullet.moveStartTime) {
+				bullet.moveStartTime = new Date();
+			}			
+			break;
+
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;

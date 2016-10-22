@@ -1,0 +1,174 @@
+/*==========================================================================================================
+	Funcional code
+============================================================================================================*/
+
+function onResize(){
+	'use strict';
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    aspectRatio = window.innerWidth/window.innerHeight;
+
+    ortographicCamera.left = aspectRatio * viewSize / -2;
+    ortographicCamera.right = aspectRatio * viewSize / 2;
+    ortographicCamera.top = viewSize * 0.75;
+    ortographicCamera.bottom = viewSize * -0.25;
+
+    ortographicCamera.updateProjectionMatrix();
+}
+
+function render(){
+	'use strict';
+
+	renderer.render(scene, currentCamera);
+}
+
+function createOrtographicCamera(){
+	'use strict';
+
+	viewSize = 900;
+	aspectRatio = window.innerWidth/window.innerHeight;
+
+	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2, aspectRatio*viewSize / 2, viewSize * 0.75, viewSize * -0.25, 1, 1000 );
+
+	ortographicCamera.position.x = 0;
+	ortographicCamera.position.y = 0;
+	ortographicCamera.position.z = 50;
+
+	ortographicCamera.lookAt(scene.position);
+}
+
+function createPerspectiveCamera1() {
+	'use strict';
+
+	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
+
+	perspectiveCamera1.position.x = 0;
+	perspectiveCamera1.position.y = -70;
+	perspectiveCamera1.position.z = 20;
+
+	perspectiveCamera1.lookAt(ship.position);  //Adjust look at to in between ship and aliens
+}
+
+function createPerspectiveCamera2() {
+	'use strict';
+
+	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 1000);
+
+	perspectiveCamera2.position.x = 0;
+	perspectiveCamera2.position.y = -70;
+	perspectiveCamera2.position.z = 20;
+
+	perspectiveCamera2.lookAt(ship.position); //Adjust look at to in between ship and aliens
+}
+
+function createScene(){
+	'use strict';
+
+	scene = new THREE.Scene();
+
+	scene.add(new THREE.AxisHelper(10));
+
+	makeSKiller();
+	ship = new Ship(0,0,0);
+	bullet = new Bullet(0,0,0);
+
+}
+
+//Keyboard events Reading
+
+function onKeyDown(e){
+	'use strict';
+
+	switch (e.keyCode) {
+		case 65: //A
+		case 97: //a
+			materialSKiller.wireframe = !materialSKiller.wireframe;
+			materialShip.wireframe = !materialShip.wireframe;
+			materialBullet.wireframe = !materialBullet.wireframe;
+			break;
+
+		case 37: // <-
+			ship.accelerationX = -0.00001;
+			if (!ship.moveStartTime) {
+				ship.moveStartTime = new Date();
+			}
+			//ship.rotation.z = 0.3
+			// ship.rotateX(PI/150);
+			break;
+		case 39:  // ->
+			ship.accelerationX = 0.00001;
+			if (!ship.moveStartTime) {
+				ship.moveStartTime = new Date();
+			}
+			// ship.rotateX(-PI/150);
+			//ship.rotation.z = -0.3
+			break;
+
+		// case 32: // space
+		// 	bullet.accelerationX = 0.00001;
+		// 	if (!bullet.moveStartTime) {
+		// 		bullet.moveStartTime = new Date();
+		// 	}			
+		// 	break;
+
+		case 49: // 1
+			currentCamera = ortographicCamera;
+			break;
+		case 50: // 2
+			currentCamera = perspectiveCamera1;
+			break;
+		case 51: // 3
+			currentCamera = perspectiveCamera2;
+			break;
+	}
+}
+
+function onKeyUp(e){
+	'use strict';
+	switch (e.keyCode){
+		case 37:
+		case 39:
+			ship.accelerationX = -ship.accelerationX;
+			ship.moveStopTime = new Date();
+			break;
+	}
+}
+
+function animate() {
+    'use strict';
+
+	ship.move();
+	perspectiveCamera1.position.x = ship.position.x;
+	scene.traverse(function (node) {
+		if (node instanceof SKiller) {
+			node.move();
+		}
+	})
+
+	render();
+	requestAnimationFrame(animate);
+}
+
+function init(){
+	'use strict';
+
+	renderer = new THREE.WebGLRenderer({ antialias: true});
+
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+
+	createScene();
+	createOrtographicCamera();
+	createPerspectiveCamera1();
+	createPerspectiveCamera2();
+
+	currentCamera = ortographicCamera;
+
+	render();
+	animate();
+
+	window.addEventListener("resize", onResize);
+	window.addEventListener("keydown", onKeyDown);
+	window.addEventListener("keyup", onKeyUp);
+}
