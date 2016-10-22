@@ -1,3 +1,17 @@
+
+/*===========================================================================================================
+#   2ª Entrega  -  28/10
+#	
+#   Calculo de velocidade é so num objeto:
+#   Superclase "movable" tem velocidade, aceleraçao, funcao move, funcao detectColision.
+#   Nave, aliens, tiro derivam dessa classe	
+#	
+#   Colisão detetada por esfera
+#	
+#	
+#	
+============================================================================================================*/
+
 var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2;
 var scene, renderer;
 var geometry, mesh;
@@ -25,12 +39,8 @@ const PI = Math.PI;
 ============================================================================================================*/
 
 function getRandomSpeed() {
-
-	var possibleSpeeds = [0.01, -0.01];
-	var index = Math.floor((Math.random() * 2));
-
-
-	return possibleSpeeds[index];
+    // Tottaly random between [-0.01, 0.01]
+	return Math.random() * 0.02 - 0.01;
 }
 
 /*==========================================================================================================
@@ -383,25 +393,25 @@ function createOrtographicCamera(){
 function createPerspectiveCamera1() {
 	'use strict';
 
-	perspectiveCamera1 = new THREE.PerspectiveCamera(70, aspectRatio, 1, 1000);
+	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
 
 	perspectiveCamera1.position.x = 0;
 	perspectiveCamera1.position.y = -70;
-	perspectiveCamera1.position.z = 0;
+	perspectiveCamera1.position.z = 20;
 
-	perspectiveCamera1.lookAt(ship.position);
+	perspectiveCamera1.lookAt(ship.position);  //Adjust look at to in between ship and aliens
 }
 
 function createPerspectiveCamera2() {
 	'use strict';
 
-	perspectiveCamera2 = new THREE.PerspectiveCamera(70, aspectRatio, 1, 1000);
+	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 1000);
 
 	perspectiveCamera2.position.x = 0;
 	perspectiveCamera2.position.y = -70;
-	perspectiveCamera2.position.z = 0;
+	perspectiveCamera2.position.z = 20;
 
-	perspectiveCamera2.lookAt(ship.position);
+	perspectiveCamera2.lookAt(ship.position); //Adjust look at to in between ship and aliens
 }
 
 function createScene(){
