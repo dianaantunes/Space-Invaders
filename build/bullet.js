@@ -4,7 +4,7 @@
 
 function Bullet(x, y, z) {
 
-	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0);
+	Movable.call(this, x, y, z, 0, 0.01, 0);
 
 	materialBullet = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
 
@@ -12,6 +12,8 @@ function Bullet(x, y, z) {
 	this.scale.x = bulletWidth;
 	this.scale.y = bulletHeight;
 	this.scale.z = bulletDepth;
+
+	this.moveStartTime = new Date();
 
 	scene.add(this);
 }

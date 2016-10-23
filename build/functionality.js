@@ -71,8 +71,6 @@ function createScene(){
 
 	makeSKiller();
 	ship = new Ship(0,0,0);
-	bullet = new Bullet(0,0,0);
-
 }
 
 //Keyboard events Reading
@@ -105,13 +103,9 @@ function onKeyDown(e){
 			//ship.rotation.z = -0.3
 			break;
 
-		// case 32: // space
-		// 	bullet.accelerationX = 0.00001;
-		// 	if (!bullet.moveStartTime) {
-		// 		bullet.moveStartTime = new Date();
-		// 	}			
-		// 	break;
-
+		case 32: // space
+		 	new Bullet(ship.position.x,0,0);
+			break;
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;
@@ -141,7 +135,7 @@ function animate() {
 	ship.move();
 	perspectiveCamera1.position.x = ship.position.x;
 	scene.traverse(function (node) {
-		if (node instanceof SKiller) {
+		if (node instanceof SKiller || node instanceof Bullet) {
 			node.move();
 		}
 	})

@@ -519,7 +519,7 @@ function onKeyDown(e){
 			bullet.accelerationX = 0.00001;
 			if (!bullet.moveStartTime) {
 				bullet.moveStartTime = new Date();
-			}			
+			}
 			break;
 
 		case 49: // 1
