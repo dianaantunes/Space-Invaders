@@ -96,12 +96,14 @@ function addFinger(obj, x, y, z){
 function SKiller(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0);
+	var radius = 5.62;
+	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, radius);
 
 	createBodySK(this, 0, 0, 0);
 	this.scale.x = sKillerWidth;
 	this.scale.y = sKillerHeight;
 	this.scale.z = sKillerDepth;
+	this.radius *= sKillerWidth;
 
 	this.moveStartTime = new Date();
 	scene.add(this);

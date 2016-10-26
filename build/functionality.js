@@ -133,10 +133,12 @@ function animate() {
     'use strict';
 
 	ship.move();
+	ship.detectCollision();
 	perspectiveCamera1.position.x = ship.position.x;
 	scene.traverse(function (node) {
 		if (node instanceof SKiller || node instanceof Bullet) {
 			node.move();
+			node.detectCollision();
 		}
 	})
 

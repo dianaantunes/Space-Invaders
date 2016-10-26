@@ -13,7 +13,7 @@ function getRandomSpeed() {
 ============================================================================================================*/
 
 // We define classes as functions
-var Movable = function(x, y, z, speedX, speedY, acceleration) {
+var Movable = function(x, y, z, speedX, speedY, acceleration, radius) {
 	THREE.Object3D.call(this);
 	this.moveStartTime = null;
 	this.moveStopTime = null;
@@ -24,6 +24,7 @@ var Movable = function(x, y, z, speedX, speedY, acceleration) {
 	this.speedY = speedY;
 	this.accelerationX = acceleration;
 	this.accelerationY = 0;
+	this.radius = radius;
 };
 
 // Create a Movable.prototype object that inherits from Object3D.prototype.
@@ -84,8 +85,21 @@ Movable.prototype.move = function() {
 	maxSpeed();
 }
 
-Movable.prototype.detectColision = function() {
+Movable.prototype.detectCollision = function() {
 	// TODO
+	scene.traverse(function (node) {
+		if (this instanceof Ship) {
+			if (node instanceof SKiller) {
+				scene.remove(this);
+			}
+			else if (this.position.x >= (width/2)) {
+				this.position.x = (width/2);
+			}
+			else if (this.position.x <= -(width/2)) {
+				this.position.x = -(width/2);
+			}
+		}
+		})
 }
 
 function maxSpeed(){

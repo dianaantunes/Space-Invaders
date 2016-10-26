@@ -75,7 +75,8 @@ function addCockpit(obj, x, y, z){
 function Ship(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	Movable.call(this, x, y, z, 0, 0, 0);
+	var radius = 9.22;
+	Movable.call(this, x, y, z, 0, 0, 0, radius);
 
 	// Initialize our Ship specific properties
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
@@ -88,6 +89,8 @@ function Ship(x, y, z) {
 	this.scale.x = shipWidth;
 	this.scale.y = shipHeight;
 	this.scale.z = shipDepth;
+	this.radius *= shipWidth; 
+
 	this.rotateY(PI/2);
 	this.rotateZ(PI/2);
 
