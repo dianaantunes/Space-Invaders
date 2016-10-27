@@ -1,12 +1,7 @@
 /*===========================================================================================================
+#
+#
 #   2ª Entrega  -  28/10
-#
-#   Calculo de velocidade é so num objeto:
-#   Superclase "movable" tem velocidade, aceleraçao, funcao move, funcao detectColision.
-#   Nave, aliens, tiro derivam dessa classe
-#
-#   Colisão detetada por esfera
-#
 #
 #
 ============================================================================================================*/
@@ -18,8 +13,9 @@ var ship, bullet;
 var t;
 
 var materialSKiller, materialShip, materialBullet;
+var lastShot = new Date().getTime();
 
-var aspectRatio, viewSize;
+var aspectRatio, viewSize = 900;
 
 var width = 1000;
 var height = 600;
@@ -37,3 +33,4 @@ var bulletHeight = 5;
 var bulletDepth = 5;
 
 const PI = Math.PI;
+const MINBULLETTIME = 300;

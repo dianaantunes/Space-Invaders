@@ -1,9 +1,33 @@
+/*===========================================================================================================
+#
+#
+#   2ª Entrega  -  28/10
+#
+#
+============================================================================================================*/
+
 /*==========================================================================================================
 	Space Killer code
 ============================================================================================================*/
 
+function makeSKiller(){
+
+	var disX = -240, disY = 120;
+
+	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
+
+	for (var row = 0; row < 5; row++) {
+        for (var col = 0; col < 5; col++) {
+        	new SKiller(disX, disY, 0);
+			disX += 120;
+ 		}
+ 		disX = -240;
+ 		disY += 50;
+	}
+}
+
 function createBodySK(obj, x, y, z){
-	'use strict';
+
 	var body = new THREE.Object3D();
 
 	addCenterRectangle(body, 0, 0, 0);
@@ -15,9 +39,8 @@ function createBodySK(obj, x, y, z){
 }
 
 function createArm(obj, x, y, z){
-	'use strict';
-	var arm = new THREE.Object3D();
 
+	var arm = new THREE.Object3D();
 
 	add1arm(arm, 2.5, -0.25, 0); //Right
 	add1arm(arm, -2.5, -0.25, 0); //Left
@@ -29,7 +52,7 @@ function createArm(obj, x, y, z){
 }
 
 function create2Arm(obj, x, y, z){
-	'use strict';
+
 	var arm2 = new THREE.Object3D();
 
 	add2arm(arm2, 3.75, -1, 0); //Right
@@ -44,7 +67,7 @@ function create2Arm(obj, x, y, z){
 }
 
 function createFinger(obj, x, y, z){
-	'use strict';
+
 	var finger = new THREE.Object3D();
 
 	addFinger(finger, 4.50, -2.25, 0); 	// RR
@@ -56,7 +79,7 @@ function createFinger(obj, x, y, z){
 }
 
 function addCenterRectangle(obj, x, y, z){
-	'use strict';
+
 	geometry = new THREE.CubeGeometry(3.5, 4, 3.5);
 	mesh = new THREE.Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
@@ -65,7 +88,7 @@ function addCenterRectangle(obj, x, y, z){
 }
 
 function add1arm(obj, x, y, z){
-	'use strict';
+
 	geometry = new THREE.CubeGeometry(1.5, 1.5, 2.5);
 	mesh = new THREE.Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
@@ -74,7 +97,7 @@ function add1arm(obj, x, y, z){
 }
 
 function add2arm(obj, x, y, z){
-	'use strict';
+
 	geometry = new THREE.CubeGeometry(1, 2, 1.5);
 	mesh = new THREE.Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
@@ -83,7 +106,7 @@ function add2arm(obj, x, y, z){
 }
 
 function addFinger(obj, x, y, z){
-	'use strict';
+
 	geometry = new THREE.CubeGeometry(0.5, 1.5, 0.5);
 	mesh = new THREE.Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
@@ -91,42 +114,71 @@ function addFinger(obj, x, y, z){
 	obj.add(mesh);
 }
 
+/*==========================================================================================================
+	Object methods
+============================================================================================================*/
 
 // Define the Ship constructor
 function SKiller(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	var radius = 6;
-	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, radius);
+	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, 6);
+
 	createBodySK(this, 0, 0, 0);
 	this.scale.x = sKillerWidth;
 	this.scale.y = sKillerHeight;
 	this.scale.z = sKillerDepth;
 	this.radius *= sKillerWidth;
-
-	this.moveStartTime = 1;
+	this.moveStart = 1;
 	scene.add(this);
 }
-
 // Create a SKiller.prototype object that inherits from Movable.prototype.
 SKiller.prototype = Object.create(Movable.prototype);
 
 // Set the constructor properly to refer to SKiller
 SKiller.prototype.constructor = SKiller;
 
-function makeSKiller(){
-	'use strict';
+SKiller.prototype.detectCollision = function(self, tentative_pos) {
 
-	var disX = -240, disY = 120;
-
-	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
-
-	for (var row = 0; row < 5; row++) {
-        for (var col = 0; col < 5; col++) {
-        	new SKiller(disX, disY, 0);
-			disX += 120;
- 		}
- 		disX = -240;
- 		disY += 50;
+	var update = 1; // A flag to check if the position will be updated
+	/*==========================================================================
+		Colision with the wall
+	==========================================================================*/
+	if ((tentative_pos[0] + self.radius) > (width/2) ||
+		(tentative_pos[0] - self.radius) < -(width/2)) {
+		// If the alien collided with the game board
+		self.speedX *= -1;
+		update = 0;
+	} else if ((tentative_pos[1] + self.radius) > (height * 0.75) ||
+			   (tentative_pos[1] - self.radius) < -(height * 0.25)) {
+		// If the alien collided with the game board
+		self.speedY *= -1;
+		update = 0;
 	}
+	/*==========================================================================
+		Colision with another alien
+	==========================================================================*/
+	scene.traverse(function (node) {
+		if (node instanceof SKiller && node !== self ) {
+			if ( checkLimits(self, node, tentative_pos) ) {
+				// If the alien collided with an alien
+				self.speedX *= -1;
+				node.speedX *= -1;
+				self.speedY *= -1;
+				node.speedY *= -1;
+				update = 0;
+			}
+		}
+	});
+	/*==========================================================================
+		Update the position
+	==========================================================================*/
+	if (update){
+		// Update the position if no colision was found
+		self.position.x = tentative_pos[0];
+		self.position.y = tentative_pos[1];
+	}
+	// Return the objects to remove from the scene.
+	// No aliens are removed, so we return NULL.
+	return [null, null];
 }

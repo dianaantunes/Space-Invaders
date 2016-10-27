@@ -1,5 +1,12 @@
-/*==========================================================================================================
+/*===========================================================================================================
+#
+#
+#   2ª Entrega  -  28/10
+#
+#
+============================================================================================================*/
 
+/*==========================================================================================================
 	Ship code
 ============================================================================================================*/
 
@@ -71,11 +78,15 @@ function addCockpit(obj, x, y, z){
 	obj.add(mesh);
 }
 
+/*==========================================================================================================
+	Object methods
+============================================================================================================*/
+
 // Define the Ship constructor
 function Ship(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	var radius = 9.22;
+	var radius = 10;
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
 	// Initialize our Ship specific properties
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
@@ -95,9 +106,38 @@ function Ship(x, y, z) {
 
 	scene.add(this);
 }
-
 // Create a Ship.prototype object that inherits from Movable.prototype.
 Ship.prototype = Object.create(Movable.prototype);
 
 // Set the constructor properly to refer to Ship
 Ship.prototype.constructor = Ship;
+
+Ship.prototype.detectCollision = function(self, tentative_pos) {
+
+	var update = 1;
+	/*==========================================================================
+		Colision with the wall
+	==========================================================================*/
+	if (tentative_pos[0] + self.radius > (width/2)) {
+		// Ship colliding with walls
+		stopMovement(self);
+		self.position.x = (width/2) - self.radius;
+		update = 0;
+	} else if (tentative_pos[0] - self.radius < -(width/2)) {
+		// Ship colliding with walls
+		stopMovement(self);
+		self.position.x = self.radius - (width/2);
+		update = 0;
+	}
+	/*==========================================================================
+		Update the position
+	==========================================================================*/
+	if (update){
+		// Update the position if no colision was found
+		self.position.x = tentative_pos[0];
+		self.position.y = tentative_pos[1];
+	}
+	// Return the objects to remove from the scene.
+	// The ship isn't removed, so we return NULL.
+	return [null, null];
+}

@@ -1,9 +1,16 @@
+/*===========================================================================================================
+#
+#
+#   2ª Entrega  -  28/10
+#
+#
+============================================================================================================*/
+
 /*==========================================================================================================
 	Funcional code
 ============================================================================================================*/
 
 function onResize(){
-	'use strict';
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -18,18 +25,18 @@ function onResize(){
 }
 
 function render(){
-	'use strict';
-
 	renderer.render(scene, currentCamera);
 }
 
 function createOrtographicCamera(){
-	'use strict';
 
-	viewSize = 900;
 	aspectRatio = window.innerWidth/window.innerHeight;
-
-	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2, aspectRatio*viewSize / 2, viewSize * 0.75, viewSize * -0.25, 1, 1000 );
+	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2,
+													  aspectRatio*viewSize / 2,
+													  viewSize * 0.75,
+													  viewSize * -0.25,
+													  1,
+													  1000 );
 
 	ortographicCamera.position.x = 0;
 	ortographicCamera.position.y = 0;
@@ -39,7 +46,6 @@ function createOrtographicCamera(){
 }
 
 function createPerspectiveCamera1() {
-	'use strict';
 
 	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
 
@@ -47,11 +53,10 @@ function createPerspectiveCamera1() {
 	perspectiveCamera1.position.y = -70;
 	perspectiveCamera1.position.z = 20;
 
-	perspectiveCamera1.lookAt(ship.position);  //Adjust look at to in between ship and aliens
+	perspectiveCamera1.lookAt(ship.position);
 }
 
 function createPerspectiveCamera2() {
-	'use strict';
 
 	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 1000);
 
@@ -59,24 +64,21 @@ function createPerspectiveCamera2() {
 	perspectiveCamera2.position.y = -70;
 	perspectiveCamera2.position.z = 20;
 
-	perspectiveCamera2.lookAt(ship.position); //Adjust look at to in between ship and aliens
+	perspectiveCamera2.lookAt(ship.position);
 }
 
 function createScene(){
-	'use strict';
 
 	scene = new THREE.Scene();
-
-	scene.add(new THREE.AxisHelper(10));
-
-	makeSKiller();
 	ship = new Ship(0,0,0);
+	makeSKiller();
 }
 
 //Keyboard events Reading
 
 function onKeyDown(e){
-	'use strict';
+
+	var currentShot;
 
 	switch (e.keyCode) {
 		case 65: //A
@@ -85,27 +87,31 @@ function onKeyDown(e){
 			materialShip.wireframe = !materialShip.wireframe;
 			materialBullet.wireframe = !materialBullet.wireframe;
 			break;
-
 		case 37: // <-
-			ship.accelerationX = -0.0005;
-			if (!ship.moveStartTime) {
-				ship.moveStartTime = 1;
+			if (!ship.moveStart && !ship.moveStop) {
+				ship.accelerationX = -0.0005;
+				ship.moveStart = 1;
+				ship.moveStop = 0;
+				ship.speedX = -0.001;
 			}
-			//ship.rotation.z = 0.3
-			// ship.rotateX(PI/150);
 			break;
+
 		case 39:  // ->
-			ship.accelerationX = 0.0005;
-			if (!ship.moveStartTime) {
-				ship.moveStartTime = 1;
+			if (!ship.moveStart && !ship.moveStop) {
+				ship.accelerationX = 0.0005;
+				ship.moveStart = 1;
+				ship.moveStop = 0;
+				ship.speedX = 0.001;
 			}
-			// ship.rotateX(-PI/150);
-			//ship.rotation.z = -0.3
 			break;
 
 		case 66: // B
 		case 98: // b
-		 	new Bullet(ship.position.x,0,0);
+			currentShot = new Date().getTime();
+			if (currentShot - lastShot > MINBULLETTIME) {
+				new Bullet(ship.position.x,0,0);
+				lastShot = new Date().getTime();
+			}
 			break;
 		case 49: // 1
 			currentCamera = ortographicCamera;
@@ -120,47 +126,63 @@ function onKeyDown(e){
 }
 
 function onKeyUp(e){
-	'use strict';
 	switch (e.keyCode){
 		case 37:
 		case 39:
-			ship.accelerationX = -ship.accelerationX;
-			ship.moveStopTime = 1;
+			if (ship.moveStart && !ship.moveStop) {
+				ship.accelerationX = -ship.accelerationX;
+				ship.moveStop = 1;
+			}
 			break;
 	}
 }
 
 function animate() {
-    'use strict';
+
 	var tentative_pos;
 	var now, delta;
+	var toRemove = [null, null];
 
+	// Calculate delta time
 	now = new Date().getTime();
 	delta = now - t;
 	t = now;
 
-	tentative_pos = ship.move(delta);
-	ship.detectCollision(ship, tentative_pos);
-	perspectiveCamera1.position.x = ship.position.x;
-
+	// Traverse the scene to update movements
 	scene.traverse(function (node) {
-		if (node instanceof SKiller || node instanceof Bullet) {
-			tentative_pos = node.move(delta);
-			node.detectCollision(node, tentative_pos);
+		if (node instanceof SKiller ||
+			node instanceof Bullet ||
+			node instanceof Ship) {
+			if(!toRemove[0] && !toRemove[1]) {
+				// If there was no bullet colision already on this iteration
+				tentative_pos = node.move(delta);
+				toRemove = node.detectCollision(node, tentative_pos);
+			}
 		}
 	})
 
+	if(toRemove[0]) {
+		// toRemove[0] has a value if a bullet left the scene or hit an alien
+		scene.remove(toRemove[0]);
+		if(toRemove[1])
+			// toRemove[1] has a value if a bullet  hit an alien
+			scene.remove(toRemove[1]);
+		toRemove = [null, null]; // Restart the vector for the next iteration
+	}
+
+	perspectiveCamera1.position.x = ship.position.x;
 	render();
 	requestAnimationFrame(animate);
 }
 
 function init(){
-	'use strict';
 
 	renderer = new THREE.WebGLRenderer({ antialias: true});
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
+
+	t = new Date().getTime();
 
 	createScene();
 	createOrtographicCamera();
@@ -168,7 +190,6 @@ function init(){
 	createPerspectiveCamera2();
 
 	currentCamera = ortographicCamera;
-	t = new Date().getTime();
 
 	render();
 	animate();
