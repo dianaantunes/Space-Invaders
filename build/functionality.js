@@ -74,6 +74,14 @@ function createScene(){
 	makeSKiller();
 }
 
+function shootBullet() {
+	currentShot = new Date().getTime();
+	if (currentShot - lastShot > MINBULLETTIME) {
+		new Bullet(ship.position.x,0,0);
+		lastShot = new Date().getTime();
+	}
+}
+
 //Keyboard events Reading
 
 function onKeyDown(e){
@@ -107,11 +115,7 @@ function onKeyDown(e){
 
 		case 66: // B
 		case 98: // b
-			currentShot = new Date().getTime();
-			if (currentShot - lastShot > MINBULLETTIME) {
-				new Bullet(ship.position.x,0,0);
-				lastShot = new Date().getTime();
-			}
+			shooting = 1;
 			break;
 		case 49: // 1
 			currentCamera = ortographicCamera;
@@ -134,6 +138,10 @@ function onKeyUp(e){
 				ship.moveStop = 1;
 			}
 			break;
+		case 66:
+		case 98:
+			shooting = 0;
+			break;
 	}
 }
 
@@ -147,6 +155,9 @@ function animate() {
 	now = new Date().getTime();
 	delta = now - t;
 	t = now;
+
+	// Shoot the bullet
+	if (shooting) shootBullet();
 
 	// Traverse the scene to update movements
 	scene.traverse(function (node) {

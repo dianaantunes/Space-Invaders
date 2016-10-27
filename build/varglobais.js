@@ -14,6 +14,7 @@ var t;
 
 var materialSKiller, materialShip, materialBullet;
 var lastShot = new Date().getTime();
+var shooting = 0;
 
 var aspectRatio, viewSize = 900;
 
