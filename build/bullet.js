@@ -3,8 +3,8 @@
 ============================================================================================================*/
 
 function Bullet(x, y, z) {
-	var radius = 0;
-	Movable.call(this, x, y, z, 0, 0.01, 0, 0);
+	var radius = 6;
+	Movable.call(this, x, y, z, 0, 0.1, 0, 0);
 
 	materialBullet = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
 

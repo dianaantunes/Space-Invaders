@@ -96,16 +96,15 @@ function addFinger(obj, x, y, z){
 function SKiller(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	var radius = 5.62;
+	var radius = 6;
 	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, radius);
-
 	createBodySK(this, 0, 0, 0);
 	this.scale.x = sKillerWidth;
 	this.scale.y = sKillerHeight;
 	this.scale.z = sKillerDepth;
 	this.radius *= sKillerWidth;
 
-	this.moveStartTime = new Date();
+	this.moveStartTime = 1;
 	scene.add(this);
 }
 
@@ -118,16 +117,16 @@ SKiller.prototype.constructor = SKiller;
 function makeSKiller(){
 	'use strict';
 
-	var disX = -120, disY = 120;
+	var disX = -240, disY = 120;
 
 	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
 
 	for (var row = 0; row < 5; row++) {
         for (var col = 0; col < 5; col++) {
         	new SKiller(disX, disY, 0);
-			disX += 60;
+			disX += 120;
  		}
- 		disX = -120;
+ 		disX = -240;
  		disY += 50;
 	}
 }

@@ -3,8 +3,7 @@
 ============================================================================================================*/
 
 function getRandomSpeed() {
-    // Tottaly random between [-0.0001, 0.0001]
-	return Math.random() * 0.0002 - 0.0001;
+	return Math.random() * 0.01 - 0.005;
 }
 
 
@@ -37,19 +36,15 @@ Movable.prototype = Object.create(THREE.Object3D.prototype);
 Movable.prototype.constructor = Movable;
 
 // We add a couple of methods
-Movable.prototype.move = function() {
+Movable.prototype.move = function(delta) {
 
 	'use strict';
-	var delta;
-	var now;
 	var currentPositionX;
 	var currentPositionY;
 	var currentSpeedX;
 	var currentSpeedY;
 	// x = x0 + v0t + (a * t^2) / 2
 	// v = v0 + at
-
-	now = new Date().getTime();
 
 	currentPositionX = this.position.x;
 	currentPositionY = this.position.y;
@@ -60,11 +55,10 @@ Movable.prototype.move = function() {
 
 	if (this.moveStartTime && this.moveStopTime) {
 
-		delta = now - this.moveStartTime.getTime();
 		this.speedX = currentSpeedX + this.accelerationX * delta;
 		this.speedY = currentSpeedY + this.accelerationY * delta;
-		this.position.x = currentPositionX + this.speedX * delta + (this.accelerationX * delta) / 4;
-		this.position.y = currentPositionY + this.speedY * delta + (this.accelerationY * delta) / 4;
+		currentPositionX  = currentPositionX + this.speedX * delta + Math.pow((this.accelerationX * delta)/2, 2);
+		currentPositionY  = currentPositionY + this.speedY * delta + Math.pow((this.accelerationY * delta)/2, 2);
 
 		if (this.speedX < 0.01 && this.speedX > -0.01) {
 			this.speedX = 0;
@@ -75,34 +69,109 @@ Movable.prototype.move = function() {
 	}
 	else if (this.moveStartTime){
 
-		delta = now - this.moveStartTime.getTime();
-		this.position.x = currentPositionX + this.speedX * delta + (this.accelerationX * delta) / 4;
-		this.position.y = currentPositionY + this.speedY * delta + (this.accelerationY * delta) / 4;
+		currentPositionX = currentPositionX + this.speedX * delta + Math.pow((this.accelerationX * delta)/2, 2);
+		currentPositionY = currentPositionY + this.speedY * delta + Math.pow((this.accelerationY * delta)/2, 2);
 		this.speedX = currentSpeedX + this.accelerationX * delta;
 		this.speedY = currentSpeedY + this.accelerationY * delta;
 	}
 
 	maxSpeed();
+
+	return [currentPositionX, currentPositionY];
 }
 
-Movable.prototype.detectCollision = function() {
-	// TODO
-	scene.traverse(function (node) {
-		if (this instanceof Ship) {
-			if (node instanceof SKiller) {
-				scene.remove(this);
-			}
-			else if (this.position.x >= (width/2)) {
-				this.position.x = (width/2);
-			}
-			else if (this.position.x <= -(width/2)) {
-				this.position.x = -(width/2);
-			}
+Movable.prototype.detectCollision = function(self, tentative_pos) {
+
+	var noUpdate = 0;
+	// Ship colliding with walls
+	if (self instanceof Ship) {
+		if (tentative_pos[0] + self.radius > (width/2)) {
+			self.position.x = (width/2) - self.radius;
+			self.speedX = 0;
+			self.accelerationX = 0;
+			self.moveStopTime = null;
+			self.moveStartTime = null;
+			noUpdate = 1;
+		} else if (tentative_pos[0] - self.radius < -(width/2)) {
+			self.position.x = self.radius -(width/2);
+			self.speedX = 0;
+			self.accelerationX = 0;
+			self.moveStopTime = null;
+			self.moveStartTime = null;
+			noUpdate = 1;
 		}
-		})
+	}
+
+	// Alien colliding with walls
+	else if (self instanceof SKiller) {
+
+		if ((tentative_pos[0] + self.radius) > (width/2)) {
+			self.speedX *= -1;
+			noUpdate = 1;
+		} else if ((tentative_pos[0] - self.radius) < -(width/2)) {
+			self.speedX *= -1;
+			noUpdate = 1;
+		} else if ((tentative_pos[1] + self.radius) > (height * 0.75)) {
+			self.speedY *= -1;
+			noUpdate = 1;
+		} else if ((tentative_pos[1] - self.radius) < -(height * 0.25)) {
+			self.speedY *= -1;
+			noUpdate = 1;
+		}
+
+		scene.traverse(function (node) {
+			if (node instanceof SKiller && node !== self ) {
+				if (
+					((self.radius + node.radius) * (self.radius + node.radius)) >=
+					(((tentative_pos[0] - node.position.x) * (tentative_pos[0] - node.position.x)) +
+				 	((tentative_pos[0] - node.position.x) * (tentative_pos[0] - node.position.x)))
+					&&
+					((self.radius + node.radius) * (self.radius + node.radius)) >=
+						(((tentative_pos[1] - node.position.y) * (tentative_pos[1] - node.position.y)) +
+					 	((tentative_pos[1] - node.position.y) * (tentative_pos[1] - node.position.y)))
+				) {
+					self.speedX *= -1;
+					node.speedX *= -1;
+					self.speedY *= -1;
+					node.speedY *= -1;
+					noUpdate = 1;
+				}
+			}
+		});
+	}
+
+	// Bullet
+	else if (self instanceof Bullet) {
+
+		scene.traverse(function (node) {
+
+			if (node instanceof SKiller) {
+				if (
+					((self.radius + node.radius) * (self.radius + node.radius)) >=
+					(((tentative_pos[0] - node.position.x) * (tentative_pos[0] - node.position.x)) +
+				 	((tentative_pos[0] - node.position.x) * (tentative_pos[0] - node.position.x)))
+					&&
+					((self.radius + node.radius) * (self.radius + node.radius)) >=
+						(((tentative_pos[1] - node.position.y) * (tentative_pos[1] - node.position.y)) +
+					 	((tentative_pos[1] - node.position.y) * (tentative_pos[1] - node.position.y)))
+				) {
+					node.position.x = 1000;
+					self.position.x = 1000;
+					noUpdate = 1;
+				}
+			}
+		});
+
+	}
+
+	if (!noUpdate){
+		self.position.x = tentative_pos[0];
+		self.position.y = tentative_pos[1];
+	}
+
 }
 
 function maxSpeed(){
-	if(ship.speedX > 0.02) ship.speedX = 0.02;
-	else if(ship.speedX < -0.02) ship.speedX = -0.02;
+	if(ship.speedX > 0.3) ship.speedX = 0.3;
+	else if(ship.speedX < -0.3) ship.speedX = -0.3;
 }

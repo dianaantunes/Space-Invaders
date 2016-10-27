@@ -87,23 +87,24 @@ function onKeyDown(e){
 			break;
 
 		case 37: // <-
-			ship.accelerationX = -0.00001;
+			ship.accelerationX = -0.0005;
 			if (!ship.moveStartTime) {
-				ship.moveStartTime = new Date();
+				ship.moveStartTime = 1;
 			}
 			//ship.rotation.z = 0.3
 			// ship.rotateX(PI/150);
 			break;
 		case 39:  // ->
-			ship.accelerationX = 0.00001;
+			ship.accelerationX = 0.0005;
 			if (!ship.moveStartTime) {
-				ship.moveStartTime = new Date();
+				ship.moveStartTime = 1;
 			}
 			// ship.rotateX(-PI/150);
 			//ship.rotation.z = -0.3
 			break;
 
-		case 32: // space
+		case 66: // B
+		case 98: // b
 		 	new Bullet(ship.position.x,0,0);
 			break;
 		case 49: // 1
@@ -124,21 +125,28 @@ function onKeyUp(e){
 		case 37:
 		case 39:
 			ship.accelerationX = -ship.accelerationX;
-			ship.moveStopTime = new Date();
+			ship.moveStopTime = 1;
 			break;
 	}
 }
 
 function animate() {
     'use strict';
+	var tentative_pos;
+	var now, delta;
 
-	ship.move();
-	ship.detectCollision();
+	now = new Date().getTime();
+	delta = now - t;
+	t = now;
+
+	tentative_pos = ship.move(delta);
+	ship.detectCollision(ship, tentative_pos);
 	perspectiveCamera1.position.x = ship.position.x;
+
 	scene.traverse(function (node) {
 		if (node instanceof SKiller || node instanceof Bullet) {
-			node.move();
-			node.detectCollision();
+			tentative_pos = node.move(delta);
+			node.detectCollision(node, tentative_pos);
 		}
 	})
 
@@ -160,6 +168,7 @@ function init(){
 	createPerspectiveCamera2();
 
 	currentCamera = ortographicCamera;
+	t = new Date().getTime();
 
 	render();
 	animate();

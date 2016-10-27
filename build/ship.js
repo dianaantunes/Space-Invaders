@@ -77,7 +77,6 @@ function Ship(x, y, z) {
 	// that "this" is ser correctly during the call
 	var radius = 9.22;
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
-
 	// Initialize our Ship specific properties
 	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
 
@@ -89,7 +88,7 @@ function Ship(x, y, z) {
 	this.scale.x = shipWidth;
 	this.scale.y = shipHeight;
 	this.scale.z = shipDepth;
-	this.radius *= shipWidth; 
+	this.radius *= shipWidth;
 
 	this.rotateY(PI/2);
 	this.rotateZ(PI/2);
