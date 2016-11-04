@@ -69,8 +69,8 @@ function createPerspectiveCamera2() {
 
 function createScene(){
 
-  directionalLight = new THREE.DirectionalLight( 0xffffff, 10 );
-  directionalLight.position.set( 0, 100, 20 );
+  directionalLight = new THREE.DirectionalLight( 0xffffff, 5 );
+  directionalLight.position.set( 0, 0, 50);
 
 	scene = new THREE.Scene();
 	ship = new Ship(0,0,0);
@@ -96,9 +96,11 @@ function onKeyDown(e){
 	switch (e.keyCode) {
 		case 65: //A
 		case 97: //a
-			materialSKiller.wireframe = !materialSKiller.wireframe;
-			materialShip.wireframe = !materialShip.wireframe;
-			materialBullet.wireframe = !materialBullet.wireframe;
+			scene.traverse(function (node) {
+				if (node instanceof Mesh) {
+					node.material.wireframe = !node.material.wireframe;
+				}
+			});
 			break;
 		case 37: // <-
 			if (!ship.moveStart && !ship.moveStop) {
@@ -123,11 +125,36 @@ function onKeyDown(e){
 			shooting = 1;
 			break;
 
-    case 78: // N
-    case 110: // n
-      console.log("Switch Light");
-      scene.remove(directionalLight);
-      break;
+		case 71: // G
+		case 103: // g
+		scene.traverse(function (node) {
+			if (node instanceof Mesh) {
+				if (node.material == node.lambertMaterial)
+					(node.material = node.phongMaterial)
+				else if (node.material == node.phongMaterial)
+					(node.material = node.lambertMaterial)
+			}
+		});
+		break;
+
+	    case 78: // N
+	    case 110: // n
+	      directionalLight.visible = !directionalLight.visible;
+	      break;
+
+		case 76: //L
+		case 108: //l
+			directionalLight.visible = !directionalLight.visible;
+			scene.traverse(function (node) {
+				if (node instanceof Mesh) {
+					if (node.material != node.basicMaterial)
+						node.material = node.basicMaterial
+					else
+						(node.material = node.lambertMaterial)
+				}
+			});
+			break;
+
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;

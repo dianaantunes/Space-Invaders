@@ -14,8 +14,6 @@ function makeSKiller(){
 
 	var disX = -240, disY = 120;
 
-	materialSKiller = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true});
-
 	for (var row = 0; row < 5; row++) {
         for (var col = 0; col < 5; col++) {
         	new SKiller(disX, disY, 0);
@@ -81,7 +79,7 @@ function createFinger(obj, x, y, z){
 function addCenterRectangle(obj, x, y, z){
 
 	geometry = new THREE.CubeGeometry(3.5, 4, 3.5);
-	mesh = new THREE.Mesh(geometry, materialSKiller);
+	mesh = new Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -90,7 +88,7 @@ function addCenterRectangle(obj, x, y, z){
 function add1arm(obj, x, y, z){
 
 	geometry = new THREE.CubeGeometry(1.5, 1.5, 2.5);
-	mesh = new THREE.Mesh(geometry, materialSKiller);
+	mesh = new Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -99,7 +97,7 @@ function add1arm(obj, x, y, z){
 function add2arm(obj, x, y, z){
 
 	geometry = new THREE.CubeGeometry(1, 2, 1.5);
-	mesh = new THREE.Mesh(geometry, materialSKiller);
+	mesh = new Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -108,7 +106,7 @@ function add2arm(obj, x, y, z){
 function addFinger(obj, x, y, z){
 
 	geometry = new THREE.CubeGeometry(0.5, 1.5, 0.5);
-	mesh = new THREE.Mesh(geometry, materialSKiller);
+	mesh = new Mesh(geometry, materialSKiller);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -122,6 +120,12 @@ function addFinger(obj, x, y, z){
 function SKiller(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x00ff11});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x00ff11});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x00ff11});
+
+	materialSKiller = [basicMaterial, phongMaterial, lambertMaterial];
+
 	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, 6);
 
 	createBodySK(this, 0, 0, 0);

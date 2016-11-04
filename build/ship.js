@@ -23,7 +23,7 @@ function createBody(obj, x, y, z){
 function addCenterCylinder(obj, x, y, z){
 	'use strict';
 	geometry = new THREE.CylinderGeometry(5, 5, 1);
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -32,7 +32,7 @@ function addCenterCylinder(obj, x, y, z){
 function addUpperCylinder(obj, x, y, z){
 	'use strict';
 	geometry = new THREE.CylinderGeometry(1, 5, 1);
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -41,7 +41,7 @@ function addUpperCylinder(obj, x, y, z){
 function addMiddleRectangle(obj, x, y, z){
 	'use strict';
 	geometry = new THREE.CubeGeometry(6, 1, 2);
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -52,7 +52,7 @@ function addLeftGun(obj, x, y, z){
 	geometry = new THREE.CubeGeometry(6, 1, 3);
 	geometry.vertices[1].z = 0.5;
 	geometry.vertices[3].z = 0.5;
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -63,7 +63,7 @@ function addRightGun(obj, x, y, z){
 	geometry = new THREE.CubeGeometry(6, 1, 3);
 	geometry.vertices[2].z = -0.5;
 	geometry.vertices[0].z = -0.5;
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
@@ -72,7 +72,7 @@ function addRightGun(obj, x, y, z){
 function addCockpit(obj, x, y, z){
 	'use strict';
 	geometry = new THREE.CylinderGeometry(1, 0.5, 2);
-	mesh = new THREE.Mesh(geometry, materialShip);
+	mesh = new Mesh(geometry, materialShip);
 	mesh.rotateZ(PI/2);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
@@ -87,10 +87,14 @@ function Ship(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
 	var radius = 10;
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x0011ff});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x0011ff});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x0000ff});
+
+	materialShip = [basicMaterial, lambertMaterial, phongMaterial]
+
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
 	// Initialize our Ship specific properties
-	materialShip = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: true});
-
 	createBody(this, 0, 0, 0);
 	addLeftGun(this, 6, 0, -2.5);
 	addRightGun(this, 6, 0, 2.5);

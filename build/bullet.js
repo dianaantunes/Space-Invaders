@@ -12,9 +12,14 @@
 
 function Bullet(x, y, z) {
 
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0xff0000, wireframe: false});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xff0000, wireframe: false});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: false});
+
+	materialBullet = [basicMaterial, lambertMaterial, phongMaterial];
+
 	Movable.call(this, x, y, z, 0, 0.1, 0, 7);
 
-	materialBullet = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
 	createBodyBullet(this, 0, 0, 0);
 	this.scale.x = bulletWidth;
 	this.scale.y = bulletHeight;
@@ -31,7 +36,7 @@ function createBodyBullet(obj, x, y, z){
 
 function addBulletCylinder(obj, x, y, z){
 	geometry = new THREE.CylinderGeometry(0.5, 0.5, 3.5, 32);
-	mesh = new THREE.Mesh(geometry, materialBullet);
+	mesh = new Mesh(geometry, materialBullet);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
