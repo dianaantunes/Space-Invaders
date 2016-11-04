@@ -69,9 +69,14 @@ function createPerspectiveCamera2() {
 
 function createScene(){
 
+  directionalLight = new THREE.DirectionalLight( 0xffffff, 10 );
+  directionalLight.position.set( 0, 100, 20 );
+
 	scene = new THREE.Scene();
 	ship = new Ship(0,0,0);
 	makeSKiller();
+
+  scene.add(directionalLight);
 }
 
 function shootBullet() {
@@ -79,7 +84,7 @@ function shootBullet() {
 	if (currentShot - lastShot > MINBULLETTIME) {
 		new Bullet(ship.position.x,0,0);
 		lastShot = new Date().getTime();
-	}
+	}78
 }
 
 //Keyboard events Reading
@@ -117,6 +122,12 @@ function onKeyDown(e){
 		case 98: // b
 			shooting = 1;
 			break;
+
+    case 78: // N
+    case 110: // n
+      console.log("Switch Light");
+      scene.remove(directionalLight);
+      break;
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;

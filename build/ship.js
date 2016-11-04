@@ -89,7 +89,7 @@ function Ship(x, y, z) {
 	var radius = 10;
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
 	// Initialize our Ship specific properties
-	materialShip = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
+	materialShip = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: true});
 
 	createBody(this, 0, 0, 0);
 	addLeftGun(this, 6, 0, -2.5);
