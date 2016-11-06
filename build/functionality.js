@@ -67,6 +67,63 @@ function createPerspectiveCamera2() {
 	perspectiveCamera2.lookAt(ship.position);
 }
 
+function makePointLight(){
+	var disX = -240, disY = 120;
+
+	for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 3; col++) {
+        	new screateBodyStar(disX, disY);
+			disX += 240;
+ 		}
+ 		disX = -240;
+ 		disY += 100;
+	}
+}
+
+//SEM CORPO
+function screateBodyStar(x, y){
+
+   	var pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
+   	pointLight.position.set(x,y,20);
+
+   	scene.add(pointLight);
+}
+
+/*  ============ A TENTAR DAR CORPO AS ESTRELAS ============
+
+
+function createBodyStar(obj, x, y, z){
+
+   	var pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
+   	pointLight.position.set(x,y,20);
+
+   	addStarbody(pointLight, 0, 0, 0)
+
+   	scene.add(pointLight);
+}
+
+function addStarbody(obj, x, y, z){
+
+	geometry = new THREE.SphereGeometry(0.5, 16, 8);
+	mesh = new Mesh(geometry, materialStar);
+	mesh.position.set(x, y, z);
+
+	obj.add(mesh);
+}
+
+function star(x, y, z){
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+
+	materialStar = [basicMaterial, phongMaterial, lambertMaterial];
+
+	createBodyStar(this, 0, 0, 0);
+}
+
+============ ============ ============ ============ ============
+*/
+
 function createScene(){
 
   directionalLight = new THREE.DirectionalLight( 0xffffff, 5 );
@@ -77,6 +134,7 @@ function createScene(){
 	makeSKiller();
 
   scene.add(directionalLight);
+  makePointLight();
 }
 
 function shootBullet() {
@@ -142,8 +200,8 @@ function onKeyDown(e){
 	      directionalLight.visible = !directionalLight.visible;
 	      break;
 
-		case 76: //L
-		case 108: //l
+		case 76: // L
+		case 108: // l
 			directionalLight.visible = !directionalLight.visible;
 			scene.traverse(function (node) {
 				if (node instanceof Mesh) {
@@ -153,6 +211,11 @@ function onKeyDown(e){
 						(node.material = node.lambertMaterial)
 				}
 			});
+			break;
+
+		case 67: // C
+		case 99: // c
+			
 			break;
 
 		case 49: // 1
