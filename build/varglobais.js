@@ -12,6 +12,8 @@ var geometry, mesh;
 var ship, bullet;
 var t;
 
+var pointLight;
+
 var materialSKiller, materialShip, materialBullet, materialStar;
 var lastShot = new Date().getTime();
 var shooting = 0;

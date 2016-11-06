@@ -70,31 +70,19 @@ function createPerspectiveCamera2() {
 function makePointLight(){
 	var disX = -240, disY = 120;
 
-	for (var row = 0; row < 3; row++) {
+	for (var row = 0; row < 2; row++) {
         for (var col = 0; col < 3; col++) {
-        	new screateBodyStar(disX, disY);
+        	new star(disX, disY, 10);
 			disX += 240;
  		}
  		disX = -240;
- 		disY += 100;
+ 		disY += 200;
 	}
 }
 
-//SEM CORPO
-function screateBodyStar(x, y){
-
-   	var pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
-   	pointLight.position.set(x,y,20);
-
-   	scene.add(pointLight);
-}
-
-/*  ============ A TENTAR DAR CORPO AS ESTRELAS ============
-
-
 function createBodyStar(obj, x, y, z){
 
-   	var pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
+   	pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
    	pointLight.position.set(x,y,20);
 
    	addStarbody(pointLight, 0, 0, 0)
@@ -104,7 +92,7 @@ function createBodyStar(obj, x, y, z){
 
 function addStarbody(obj, x, y, z){
 
-	geometry = new THREE.SphereGeometry(0.5, 16, 8);
+	geometry = new THREE.SphereGeometry(2, 16, 8);
 	mesh = new Mesh(geometry, materialStar);
 	mesh.position.set(x, y, z);
 
@@ -118,11 +106,8 @@ function star(x, y, z){
 
 	materialStar = [basicMaterial, phongMaterial, lambertMaterial];
 
-	createBodyStar(this, 0, 0, 0);
+	createBodyStar(this, x, y, z);
 }
-
-============ ============ ============ ============ ============
-*/
 
 function createScene(){
 
@@ -215,7 +200,7 @@ function onKeyDown(e){
 
 		case 67: // C
 		case 99: // c
-			
+			pointLight.visible = !pointLight.visible;g
 			break;
 
 		case 49: // 1
