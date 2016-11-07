@@ -82,7 +82,7 @@ function makePointLight(){
 
 function createBodyStar(obj, x, y, z){
 
-   	pointLight = new THREE.PointLight(0xffffff, 2.4, 500);
+   	pointLight = new THREE.PointLight("#FF00FF", 2.4, 500);
    	pointLight.position.set(x,y,20);
 
    	addStarbody(pointLight, 0, 0, 0)
@@ -200,7 +200,11 @@ function onKeyDown(e){
 
 		case 67: // C
 		case 99: // c
-			pointLight.visible = !pointLight.visible;g
+			scene.traverse(function (node) {
+				if (node instanceof THREE.PointLight) {
+					node.visible = !node.visible;
+				}
+			});
 			break;
 
 		case 49: // 1
