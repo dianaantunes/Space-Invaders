@@ -83,7 +83,7 @@ function makePointLight(){
 function createBodyStar(obj, x, y, z){
 
    	pointLight = new THREE.PointLight("#FF00FF", 2.4, 500);
-   	pointLight.position.set(x,y,20);
+   	pointLight.position.set(x,y,45);
 
    	addStarbody(pointLight, 0, 0, 0)
 
@@ -93,18 +93,15 @@ function createBodyStar(obj, x, y, z){
 function addStarbody(obj, x, y, z){
 
 	geometry = new THREE.SphereGeometry(2, 16, 8);
-	mesh = new Mesh(geometry, materialStar);
+	mesh = new THREE.Mesh(geometry, materialStar);
 	mesh.position.set(x, y, z);
 
 	obj.add(mesh);
 }
 
 function star(x, y, z){
-	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
-	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
-	var basicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
 
-	materialStar = [basicMaterial, phongMaterial, lambertMaterial];
+	materialStar = new THREE.MeshBasicMaterial({color: 0xffffff});
 
 	createBodyStar(this, x, y, z);
 }

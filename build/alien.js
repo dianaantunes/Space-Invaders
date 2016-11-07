@@ -124,7 +124,7 @@ function SKiller(x, y, z) {
 	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x00ff11});
 	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x00ff11});
 
-	materialSKiller = [basicMaterial, phongMaterial, lambertMaterial];
+	materialSKiller = [basicMaterial, lambertMaterial, phongMaterial];
 
 	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, 6);
 
