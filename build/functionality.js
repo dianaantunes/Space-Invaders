@@ -1,14 +1,15 @@
-/*===========================================================================================================
+/*==============================================================================
 #
 #
-#   2ª Entrega  -  28/10
+#   3ª Entrega  -  11/11
 #
 #
-============================================================================================================*/
+==============================================================================*/
 
-/*==========================================================================================================
+/*==============================================================================
 	Funcional code
-============================================================================================================*/
+==============================================================================*/
+
 
 function onResize(){
 
@@ -22,6 +23,11 @@ function onResize(){
     ortographicCamera.bottom = viewSize * -0.25;
 
     ortographicCamera.updateProjectionMatrix();
+
+	perspectiveCamera1.aspect = aspectRatio;
+	perspectiveCamera2.aspect = aspectRatio;
+	perspectiveCamera1.updateProjectionMatrix();
+	perspectiveCamera2.updateProjectionMatrix();
 }
 
 function render(){
@@ -67,48 +73,9 @@ function createPerspectiveCamera2() {
 	perspectiveCamera2.lookAt(ship.position);
 }
 
-function makePointLight(){
-	var disX = -240, disY = 120;
-
-	for (var row = 0; row < 2; row++) {
-        for (var col = 0; col < 3; col++) {
-        	new star(disX, disY, 10);
-			disX += 240;
- 		}
- 		disX = -240;
- 		disY += 200;
-	}
-}
-
-function createBodyStar(obj, x, y, z){
-
-   	pointLight = new THREE.PointLight("#FF00FF", 2.4, 500);
-   	pointLight.position.set(x,y,45);
-
-   	addStarbody(pointLight, 0, 0, 0)
-
-   	scene.add(pointLight);
-}
-
-function addStarbody(obj, x, y, z){
-
-	geometry = new THREE.SphereGeometry(2, 16, 8);
-	mesh = new THREE.Mesh(geometry, materialStar);
-	mesh.position.set(x, y, z);
-
-	obj.add(mesh);
-}
-
-function star(x, y, z){
-
-	materialStar = new THREE.MeshBasicMaterial({color: 0xffffff});
-
-	createBodyStar(this, x, y, z);
-}
-
 function createScene(){
 
-  directionalLight = new THREE.DirectionalLight( 0xffffff, 5 );
+  directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
   directionalLight.position.set( 0, 0, 50);
 
 	scene = new THREE.Scene();
@@ -127,21 +94,37 @@ function shootBullet() {
 	}78
 }
 
-//Keyboard events Reading
+function switchWireframe() {
+	for(var i=0; i < 3; i++) {
+		materialShip[i].wireframe = !materialShip[i].wireframe;
+		materialSKiller[i].wireframe = !materialSKiller[i].wireframe;
+		materialBullet[i].wireframe = !materialBullet[i].wireframe;
+	}
+}
+
+function switchMaterial() {
+	scene.traverse(function (node) {
+		if (node instanceof Mesh) {
+			if (node.material == node.lambertMaterial)
+				(node.material = node.phongMaterial)
+			else if (node.material == node.phongMaterial)
+				(node.material = node.lambertMaterial)
+		}
+	});
+}
+
+// Keyboard events Reading
 
 function onKeyDown(e){
 
 	var currentShot;
 
 	switch (e.keyCode) {
-		case 65: //A
-		case 97: //a
-			scene.traverse(function (node) {
-				if (node instanceof Mesh) {
-					node.material.wireframe = !node.material.wireframe;
-				}
-			});
+		case 65: // A
+		case 97: // a
+			switchWireframe();
 			break;
+
 		case 37: // <-
 			if (!ship.moveStart && !ship.moveStop) {
 				ship.accelerationX = -0.0005;
@@ -167,15 +150,8 @@ function onKeyDown(e){
 
 		case 71: // G
 		case 103: // g
-		scene.traverse(function (node) {
-			if (node instanceof Mesh) {
-				if (node.material == node.lambertMaterial)
-					(node.material = node.phongMaterial)
-				else if (node.material == node.phongMaterial)
-					(node.material = node.lambertMaterial)
-			}
-		});
-		break;
+			switchMaterial();
+			break;
 
 	    case 78: // N
 	    case 110: // n
@@ -184,7 +160,6 @@ function onKeyDown(e){
 
 		case 76: // L
 		case 108: // l
-			directionalLight.visible = !directionalLight.visible;
 			scene.traverse(function (node) {
 				if (node instanceof Mesh) {
 					if (node.material != node.basicMaterial)
@@ -207,9 +182,11 @@ function onKeyDown(e){
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;
+
 		case 50: // 2
 			currentCamera = perspectiveCamera1;
 			break;
+
 		case 51: // 3
 			currentCamera = perspectiveCamera2;
 			break;
@@ -225,6 +202,7 @@ function onKeyUp(e){
 				ship.moveStop = 1;
 			}
 			break;
+
 		case 66:
 		case 98:
 			shooting = 0;

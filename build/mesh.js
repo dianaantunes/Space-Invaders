@@ -1,37 +1,32 @@
-/*===========================================================================================================
+/*==============================================================================
 #
 #
-#   2ª Entrega  -  28/10
+#   3ª Entrega  -  11/11
 #
 #
-============================================================================================================*/
+==============================================================================*/
 
-/*==========================================================================================================
+/*==============================================================================
 	Mesh superclass
-============================================================================================================*/
+==============================================================================*/
 
 // We define classes as functions
-var Mesh = function(color, material) {
+var Mesh = function(geometry, material) {
+// material[0] = basic, material[1] = lambert, material[2] = phong
 
 	THREE.Mesh.call(this, geometry, material[0]);
 
-	this.lambertMaterial = material[1];
-	this.lambertMaterial.shading = THREE.FlatShading;
-
-	this.phongMaterial = material[2];
-	this.phongMaterial.shininess = 30;
-	this.phongMaterial.shading = THREE.FlatShading;
-
 	this.basicMaterial = material[0];
+	this.lambertMaterial = material[1];
+	this.phongMaterial = material[2];
 
-	this.material = this.lambertMaterial;
-	this.material.wireframe = false;
+	this.material = this.phongMaterial;
 };
 
-// Create a Movable.prototype object that inherits from Object3D.prototype.
+// Create a Mesh.prototype object that inherits from Object3D.prototype.
 // Note: A common error here is to use "new Object3D()" to create the
-// Movable.prototype. The correct place to call Object3D is above, where we call
+// Mesh.prototype. The correct place to call Object3D is above, where we call
 // it from Movable.
 Mesh.prototype = Object.create(THREE.Mesh.prototype);
-// Set the constructor properly to refer to Movable
+// Set the constructor properly to refer to Mesh
 Mesh.prototype.constructor = Mesh;

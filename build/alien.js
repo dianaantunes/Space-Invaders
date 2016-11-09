@@ -1,18 +1,28 @@
-/*===========================================================================================================
+/*==============================================================================
 #
 #
-#   2ª Entrega  -  28/10
+#   3ª Entrega  -  11/11
 #
 #
-============================================================================================================*/
+==============================================================================*/
 
-/*==========================================================================================================
+/*==============================================================================
 	Space Killer code
-============================================================================================================*/
+==============================================================================*/
 
 function makeSKiller(){
 
 	var disX = -240, disY = 120;
+
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x008000,
+														emissive: 0x001100});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x008000,
+													emissive: 0x001100,
+													specular: 0x11ff11,
+													shininess: 20});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
+
+	materialSKiller = [basicMaterial, lambertMaterial, phongMaterial];
 
 	for (var row = 0; row < 5; row++) {
         for (var col = 0; col < 5; col++) {
@@ -120,11 +130,6 @@ function addFinger(obj, x, y, z){
 function SKiller(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
-	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x00ff11});
-	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x00ff11});
-	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x00ff11});
-
-	materialSKiller = [basicMaterial, lambertMaterial, phongMaterial];
 
 	Movable.call(this, x, y, z, getRandomSpeed(), getRandomSpeed(), 0, 6);
 

@@ -1,22 +1,26 @@
-/*===========================================================================================================
+/*==============================================================================
 #
 #
-#   2ª Entrega  -  28/10
+#   3ª Entrega  -  11/11
 #
 #
-============================================================================================================*/
+==============================================================================*/
 
-/*==========================================================================================================
+/*==============================================================================
 	Bullet code
-============================================================================================================*/
+==============================================================================*/
+
+var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x800000,
+													emissive: 0x110000});
+var phongMaterial = new THREE.MeshPhongMaterial({color: 0x800000,
+												emissive: 0x110000,
+												specular: 0xff1111,
+												shininess: 20});
+var basicMaterial = new THREE.MeshBasicMaterial({color: 0x800000});
+
+materialBullet = [basicMaterial, lambertMaterial, phongMaterial];
 
 function Bullet(x, y, z) {
-
-	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0xff0000, wireframe: false});
-	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xff0000, wireframe: false});
-	var basicMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: false});
-
-	materialBullet = [basicMaterial, lambertMaterial, phongMaterial];
 
 	Movable.call(this, x, y, z, 0, 0.1, 0, 7);
 
@@ -35,7 +39,7 @@ function createBodyBullet(obj, x, y, z){
 }
 
 function addBulletCylinder(obj, x, y, z){
-	geometry = new THREE.CylinderGeometry(0.5, 0.5, 3.5, 32);
+	geometry = new THREE.CylinderGeometry(0.5, 0.5, 3.5);
 	mesh = new Mesh(geometry, materialBullet);
 	mesh.position.set(x, y, z);
 

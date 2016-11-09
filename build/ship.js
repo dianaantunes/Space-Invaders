@@ -1,104 +1,145 @@
-/*===========================================================================================================
+/*==============================================================================
 #
 #
-#   2ª Entrega  -  28/10
+#   3ª Entrega  -  11/11
 #
 #
-============================================================================================================*/
+==============================================================================*/
 
-/*==========================================================================================================
+/*==============================================================================
 	Ship code
-============================================================================================================*/
+==============================================================================*/
 
 function createBody(obj, x, y, z){
 	'use strict';
-	var body = new THREE.Object3D();
-
-	addCenterCylinder(body, 0, 0, 0);
-	addUpperCylinder(body, 0, 1, 0);
-	addMiddleRectangle(body, 3, 0, 0);
-	obj.add(body);
-}
-
-function addCenterCylinder(obj, x, y, z){
-	'use strict';
-	geometry = new THREE.CylinderGeometry(5, 5, 1);
-	mesh = new Mesh(geometry, materialShip);
+	var vertices = [new THREE.Vector3(0,0,2),
+					new THREE.Vector3(0,-5,0),
+					new THREE.Vector3(4,-2,0),
+					new THREE.Vector3(4,2,0),
+					new THREE.Vector3(0,5,0),
+					new THREE.Vector3(-4,2,0),
+					new THREE.Vector3(-4,-2,0),
+					new THREE.Vector3(2,0,1),
+					new THREE.Vector3(2,2,1),
+					new THREE.Vector3(-2,2,1)];
+					console.log("vertices")
+	var faces = [new THREE.Face3(0,1,2),
+				 new THREE.Face3(0,2,7),
+				 new THREE.Face3(0,7,3),
+				 new THREE.Face3(7,2,3),
+				 new THREE.Face3(0,3,8),
+				 new THREE.Face3(0,8,4),
+				 new THREE.Face3(8,3,4),
+				 new THREE.Face3(0,4,9),
+				 new THREE.Face3(0,9,5),
+				 new THREE.Face3(9,4,5),
+				 new THREE.Face3(0,5,6),
+				 new THREE.Face3(0,6,1)];
+	var geometry = new THREE.Geometry();
+	geometry.vertices = vertices;
+	geometry.faces = faces;
+	geometry.computeFaceNormals();
+	var mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
-
-	obj.add(mesh);
-}
-
-function addUpperCylinder(obj, x, y, z){
-	'use strict';
-	geometry = new THREE.CylinderGeometry(1, 5, 1);
-	mesh = new Mesh(geometry, materialShip);
-	mesh.position.set(x, y, z);
-
-	obj.add(mesh);
-}
-
-function addMiddleRectangle(obj, x, y, z){
-	'use strict';
-	geometry = new THREE.CubeGeometry(6, 1, 2);
-	mesh = new Mesh(geometry, materialShip);
-	mesh.position.set(x, y, z);
-
-	obj.add(mesh);
-}
-
-function addLeftGun(obj, x, y, z){
-	'use strict';
-	geometry = new THREE.CubeGeometry(6, 1, 3);
-	geometry.vertices[1].z = 0.5;
-	geometry.vertices[3].z = 0.5;
-	mesh = new Mesh(geometry, materialShip);
-	mesh.position.set(x, y, z);
+	mesh.rotateX(-PI/2);
+	mesh.rotateZ(-PI/2);
 
 	obj.add(mesh);
 }
 
 function addRightGun(obj, x, y, z){
 	'use strict';
-	geometry = new THREE.CubeGeometry(6, 1, 3);
-	geometry.vertices[2].z = -0.5;
-	geometry.vertices[0].z = -0.5;
-	mesh = new Mesh(geometry, materialShip);
+	var vertices = [new THREE.Vector3(2,2,1),
+					new THREE.Vector3(4,2,0),
+					new THREE.Vector3(0,5,0),
+					new THREE.Vector3(2,10,0)];
+
+	var faces = [new THREE.Face3(0,1,3),
+				 new THREE.Face3(0,3,2)];
+
+	var geometry = new THREE.Geometry();
+	geometry.vertices = vertices;
+	geometry.faces = faces;
+	geometry.computeFaceNormals();
+	var mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
+	mesh.rotateX(-PI/2);
+	mesh.rotateZ(-PI/2);
+
+	obj.add(mesh);
+}
+
+function addLeftGun(obj, x, y, z){
+	'use strict';
+	var vertices = [new THREE.Vector3(-2,2,1),
+					new THREE.Vector3(-4,2,0),
+					new THREE.Vector3(0,5,0),
+					new THREE.Vector3(-2,10,0)];
+
+	var faces = [new THREE.Face3(0,3,1),
+				 new THREE.Face3(0,2,3)];
+
+	var geometry = new THREE.Geometry();
+	geometry.vertices = vertices;
+	geometry.faces = faces;
+	geometry.computeFaceNormals();
+	var mesh = new Mesh(geometry, materialShip);
+	mesh.position.set(x, y, z);
+	mesh.rotateX(-PI/2);
+	mesh.rotateZ(-PI/2);
 
 	obj.add(mesh);
 }
 
 function addCockpit(obj, x, y, z){
 	'use strict';
-	geometry = new THREE.CylinderGeometry(1, 0.5, 2);
-	mesh = new Mesh(geometry, materialShip);
-	mesh.rotateZ(PI/2);
+	var vertices = [new THREE.Vector3(2,0,1),
+					new THREE.Vector3(4,-2,0),
+					new THREE.Vector3(4,2,0),
+					new THREE.Vector3(6,3,1)];
+
+	var faces = [new THREE.Face3(0,1,3),
+				 new THREE.Face3(0,3,2),
+				 new THREE.Face3(2,3,1)];
+
+	var geometry = new THREE.Geometry();
+	geometry.vertices = vertices;
+	geometry.faces = faces;
+	geometry.computeFaceNormals();
+	var mesh = new Mesh(geometry, materialShip);
 	mesh.position.set(x, y, z);
+	mesh.rotateX(-PI/2);
+	mesh.rotateZ(-PI/2)
+
 	obj.add(mesh);
 }
 
-/*==========================================================================================================
+/*==============================================================================
 	Object methods
-============================================================================================================*/
+==============================================================================*/
 
 // Define the Ship constructor
 function Ship(x, y, z) {
 	// Call the parent constructor, making sure (using call)
 	// that "this" is ser correctly during the call
 	var radius = 10;
-	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x0011ff});
-	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x0011ff});
-	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x0000ff});
 
-	materialShip = [basicMaterial, lambertMaterial, phongMaterial]
+	var lambertMaterial = new THREE.MeshLambertMaterial({color: 0x001180,
+														emissive: 0x000011});
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x001180,
+													emissive: 0x000011,
+													specular: 0x1111ff,
+													shininess: 40});
+	var basicMaterial = new THREE.MeshBasicMaterial({color: 0x0011ff});
+
+	materialShip = [basicMaterial, lambertMaterial, phongMaterial];
 
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
 	// Initialize our Ship specific properties
 	createBody(this, 0, 0, 0);
-	addLeftGun(this, 6, 0, -2.5);
-	addRightGun(this, 6, 0, 2.5);
-	addCockpit(this, 2, 0, 5);
+	addRightGun(this, 0, 0, 0);
+	addLeftGun(this, 0, 0, 0);
+	addCockpit(this, 0, 0, 0);
 
 	this.scale.x = shipWidth;
 	this.scale.y = shipHeight;
@@ -107,7 +148,6 @@ function Ship(x, y, z) {
 
 	this.rotateY(PI/2);
 	this.rotateZ(PI/2);
-
 	scene.add(this);
 }
 // Create a Ship.prototype object that inherits from Movable.prototype.
