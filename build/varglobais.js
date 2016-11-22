@@ -15,6 +15,7 @@ var t;
 var pointLight;
 
 var materialSKiller, materialShip, materialBullet, materialStar;
+var sceneMesh;
 var lastShot = new Date().getTime();
 var shooting = 0;
 

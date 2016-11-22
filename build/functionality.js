@@ -73,17 +73,43 @@ function createPerspectiveCamera2() {
 	perspectiveCamera2.lookAt(ship.position);
 }
 
+function createSpotlight() {
+
+	spotlight = new THREE.SpotLight( 0xffffff, 10, 400, Math.PI/4);
+
+	spotlight.position.set( 0, -20, 5);
+	scene.add( spotlight );
+
+	spotlight.target = ship;
+	scene.add( spotlight.target );
+
+	ship.spotlight = spotlight;
+}
+
 function createScene(){
 
   directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
   directionalLight.position.set( 0, 0, 50);
 
-	scene = new THREE.Scene();
-	ship = new Ship(0,0,0);
-	makeSKiller();
+  scene = new THREE.Scene();
+  ship = new Ship(0,0,0);
+  makeSKiller();
 
   scene.add(directionalLight);
   makePointLight();
+  createSpotlight();
+
+  var geometry = new THREE.PlaneGeometry( 2560, 1440);
+  var material = new THREE.MeshBasicMaterial();
+  var mesh    = new THREE.Mesh( geometry, material);
+
+  var loader = new THREE.TextureLoader();
+  mesh.material.map = loader.load('galaxy.jpg');
+
+  scene.mesh = mesh;
+
+  scene.add( scene.mesh);
+
 }
 
 function shootBullet() {
@@ -91,7 +117,7 @@ function shootBullet() {
 	if (currentShot - lastShot > MINBULLETTIME) {
 		new Bullet(ship.position.x,0,0);
 		lastShot = new Date().getTime();
-	}78
+	}
 }
 
 function switchWireframe() {
@@ -111,6 +137,13 @@ function switchMaterial() {
 				(node.material = node.lambertMaterial)
 		}
 	});
+}
+
+function gameOver() {
+
+	var loader = new THREE.TextureLoader();
+	scene.mesh.material.map = loader.load('gameover.jpg');
+
 }
 
 // Keyboard events Reading
@@ -179,6 +212,11 @@ function onKeyDown(e){
 			});
 			break;
 
+		case 72: // H
+		case 104: // h
+			ship.spotlight.visible = !ship.spotlight.visible;
+			break;
+
 		case 49: // 1
 			currentCamera = ortographicCamera;
 			break;
@@ -189,6 +227,10 @@ function onKeyDown(e){
 
 		case 51: // 3
 			currentCamera = perspectiveCamera2;
+			break;
+
+		case 52: // 4
+			gameOver();
 			break;
 	}
 }
