@@ -6,7 +6,7 @@
 #
 ============================================================================================================*/
 
-var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2;
+var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2, ortographicCamera2;
 var scene, renderer;
 var geometry, mesh;
 var ship, bullet;
@@ -38,3 +38,7 @@ var bulletDepth = 5;
 
 const PI = Math.PI;
 const MINBULLETTIME = 300;
+
+var alienCount = 0;
+var numLives = 3;
+var Lives;

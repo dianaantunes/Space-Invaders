@@ -139,6 +139,7 @@ function SKiller(x, y, z) {
 	this.scale.z = sKillerDepth;
 	this.radius *= sKillerWidth;
 	this.moveStart = 1;
+	alienCount++;
 	scene.add(this);
 }
 // Create a SKiller.prototype object that inherits from Movable.prototype.
@@ -150,6 +151,7 @@ SKiller.prototype.constructor = SKiller;
 SKiller.prototype.detectCollision = function(self, tentative_pos) {
 
 	var update = 1; // A flag to check if the position will be updated
+	var toRemove = [null, null];	// A vector to store the objects to remove
 	/*==========================================================================
 		Colision with the wall
 	==========================================================================*/
@@ -176,6 +178,12 @@ SKiller.prototype.detectCollision = function(self, tentative_pos) {
 				self.speedY *= -1;
 				node.speedY *= -1;
 				update = 0;
+			}			
+		}
+		if (node instanceof Ship) {
+			if ( checkLimits(self, node, tentative_pos) ) {
+				toRemove[0] = Lives[--numLives]; //send the life/'ship' to remove and decrement numLives
+				toRemove[1] = self;
 			}
 		}
 	});
@@ -188,6 +196,5 @@ SKiller.prototype.detectCollision = function(self, tentative_pos) {
 		self.position.y = tentative_pos[1];
 	}
 	// Return the objects to remove from the scene.
-	// No aliens are removed, so we return NULL.
-	return [null, null];
+	return toRemove;
 }

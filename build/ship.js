@@ -22,7 +22,6 @@ function createBody(obj, x, y, z){
 					new THREE.Vector3(2,0,1),
 					new THREE.Vector3(2,2,1),
 					new THREE.Vector3(-2,2,1)];
-					console.log("vertices")
 	var faces = [new THREE.Face3(0,1,2),
 				 new THREE.Face3(0,2,7),
 				 new THREE.Face3(0,7,3),
@@ -118,6 +117,23 @@ function addCockpit(obj, x, y, z){
 	Object methods
 ==============================================================================*/
 
+// Create the lives from instances of ship
+function makeLives(numLives){
+	Lives = [numLives];
+	var posX = -1000;
+	var posY = 600;
+
+	for (var i = 0; i < numLives; i++){
+		Lives[i] = new Ship(0, 0, 0);
+		Lives[i].position.x = posX;
+		Lives[i].position.y = posY;
+		posY -= 100;
+		scene.add(Lives[i]);
+	}
+}
+
+
+
 // Define the Ship constructor
 function Ship(x, y, z) {
 	// Call the parent constructor, making sure (using call)
@@ -136,10 +152,10 @@ function Ship(x, y, z) {
 
 	Movable.call(this, x, y, z, 0, 0, 0, radius);
 	// Initialize our Ship specific properties
-	createBody(this, 0, 0, 0);
-	addRightGun(this, 0, 0, 0);
-	addLeftGun(this, 0, 0, 0);
-	addCockpit(this, 0, 0, 0);
+	createBody(this, x, y, z);
+	addRightGun(this, x, y, z);
+	addLeftGun(this, x, y, z);
+	addCockpit(this, x, y, z);
 
 	this.scale.x = shipWidth;
 	this.scale.y = shipHeight;
@@ -148,7 +164,7 @@ function Ship(x, y, z) {
 
 	this.rotateY(PI/2);
 	this.rotateZ(PI/2);
-	scene.add(this);
+	return this;
 }
 // Create a Ship.prototype object that inherits from Movable.prototype.
 Ship.prototype = Object.create(Movable.prototype);

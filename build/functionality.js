@@ -31,13 +31,23 @@ function onResize(){
 }
 
 function render(){
+	renderer.clear();
+	renderer.setViewport(0, 0, 100, window.innerHeight);	
+	renderer.setScissor(0, 0, 100, window.innerWidth );
+	renderer.setScissorTest(true);
+	renderer.render(scene, ortographicCamera2);
+
+	renderer.setViewport(100, 0, window.innerWidth, window.innerHeight);
+	renderer.setScissor(0, 0, window.innerWidth, window.innerWidth );
+	renderer.setScissorTest(true);
 	renderer.render(scene, currentCamera);
 }
 
 function createOrtographicCamera(){
 
 	aspectRatio = window.innerWidth/window.innerHeight;
-	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2,
+	//TODO replace 100 with a relative value
+	ortographicCamera = new THREE.OrthographicCamera( aspectRatio*viewSize / -2 + 100,
 													  aspectRatio*viewSize / 2,
 													  viewSize * 0.75,
 													  viewSize * -0.25,
@@ -50,6 +60,25 @@ function createOrtographicCamera(){
 
 	ortographicCamera.lookAt(scene.position);
 }
+
+function createOrtographicCamera2(){
+
+	aspectRatio = window.innerWidth/window.innerHeight;
+	//TODO replace 100 with a relative value
+	ortographicCamera2 = new THREE.OrthographicCamera( aspectRatio*viewSize / -2,
+													  aspectRatio*viewSize / -2 + 100,
+													  viewSize * 0.75,
+													  viewSize * -0.25,
+													  1,
+													  1000 );
+
+	ortographicCamera2.position.x = 0;
+	ortographicCamera2.position.y = 0;
+	ortographicCamera2.position.z = 50;
+
+	ortographicCamera2.lookAt(scene.position);
+}
+
 
 function createPerspectiveCamera1() {
 
@@ -92,8 +121,10 @@ function createScene(){
   directionalLight.position.set( 0, 0, 50);
 
   scene = new THREE.Scene();
+  makeLives(numLives);
   ship = new Ship(0,0,0);
   makeSKiller();
+  
 
   scene.add(directionalLight);
   makePointLight();
@@ -107,9 +138,8 @@ function createScene(){
   mesh.material.map = loader.load('galaxy.jpg');
 
   scene.mesh = mesh;
-
+  scene.add(ship);
   scene.add( scene.mesh);
-
 }
 
 function shootBullet() {
@@ -279,15 +309,26 @@ function animate() {
 		}
 	})
 
-	if(toRemove[0]) {
+	if(toRemove[0] || toRemove[1]) {
 		// toRemove[0] has a value if a bullet left the scene or hit an alien
+		// or an alien hit the ship
 		scene.remove(toRemove[0]);
-		if(toRemove[1])
+		if(toRemove[1]){
 			// toRemove[1] has a value if a bullet  hit an alien
 			scene.remove(toRemove[1]);
+			alienCount--;
+		}
 		toRemove = [null, null]; // Restart the vector for the next iteration
 	}
+	if (!alienCount || !numLives){ // if there are no more aliens or lives, it's gameover
+		gameOver();
+	}
 
+	//XXX workaround for the collisiondetection 
+	// of ship vs wall doesnt let ships past the wall 
+	for (var i = 0; i < numLives; i++){
+		Lives[i].position.x = -900; 
+	}
 	perspectiveCamera1.position.x = ship.position.x;
 	render();
 	requestAnimationFrame(animate);
@@ -296,7 +337,7 @@ function animate() {
 function init(){
 
 	renderer = new THREE.WebGLRenderer({ antialias: true});
-
+	renderer.autoClear = false;
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
@@ -304,6 +345,7 @@ function init(){
 
 	createScene();
 	createOrtographicCamera();
+	createOrtographicCamera2();
 	createPerspectiveCamera1();
 	createPerspectiveCamera2();
 
