@@ -127,7 +127,7 @@ function makeLives(numLives){
 		Lives[i] = new Ship(0, 0, 0);
 		Lives[i].position.x = 0;
 		Lives[i].position.y = posY;
-		posY -= 100;	
+		posY -= 100;
 	}
 }
 

@@ -1,7 +1,7 @@
 /*==============================================================================
 #
 #
-#   3ª Entrega  -  11/11
+#   4ª Entrega  -  25/11
 #
 #
 ==============================================================================*/
@@ -75,7 +75,7 @@ function createOrtographicCamera2(){
 
 function createPerspectiveCamera1() {
 
-	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
+	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 10000);
 
 	perspectiveCamera1.position.x = 0;
 	perspectiveCamera1.position.y = -70;
@@ -86,7 +86,7 @@ function createPerspectiveCamera1() {
 
 function createPerspectiveCamera2() {
 
-	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 1000);
+	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 10000);
 
 	perspectiveCamera2.position.x = 0;
 	perspectiveCamera2.position.y = -70;
@@ -110,9 +110,12 @@ function createSpotlight() {
 }
 
 function createSceneLives(){
+	// Create a separate scene with each ship indicating a life
+
 	sceneLives = new THREE.Scene();
-	makeLives(numLives);
-	var light = new THREE.AmbientLight(0xffffffff)
+	makeLives(numLives); // In ship.js
+
+	var light = new THREE.AmbientLight(0xffffffff) // Global lighting the scene
 	sceneLives.add(light);
 
 	for (var i = 0; i < numLives; i++){
@@ -136,15 +139,13 @@ function createScene(){
   makePointLight();
   createSpotlight();
 
-
+  // Background - Texture in a plane geometry
   var loader = new THREE.TextureLoader();
   var texture = loader.load("galaxy.jpg");
   var material = new THREE.MeshBasicMaterial();
   material.map = texture;
-
   var geometry = new THREE.PlaneGeometry( 3500, 2498);
   sceneMesh    = new THREE.Mesh( geometry, material);
-
   sceneMesh.translateY( height );
   sceneMesh.rotateX( Math.PI / 6);
   scene.add( sceneMesh );
@@ -184,10 +185,10 @@ function gameOver() {
 
 	pause = true;
 
+	// Message - Texture in a plane geometry
 	texture = THREE.ImageUtils.loadTexture('game_over.jpg', {}, function() {
 	    render();
 	});
-
 	var overMaterial = new THREE.MeshBasicMaterial();
 	overMaterial.map = texture;
 	var overGeometry = new THREE.PlaneGeometry(1500, 300);
@@ -203,8 +204,7 @@ function pauseGame() {
 	if (!pause) {
 		pause = true;
 
-		console.log("Pause");
-
+		// Message - Texture in a plane geometry
 		texture = THREE.ImageUtils.loadTexture('paused.jpg', {}, function() {
 			render();
 		});
@@ -217,9 +217,10 @@ function pauseGame() {
 		pauseMesh.translateZ( 10);
 		pauseMesh.name = "Pause";
 		scene.add( pauseMesh );
-		
+
 	} else {
 
+		// To unpause, remove the message from the screen and restore the timer
 		scene.traverse(function (node) {
 			if (node instanceof THREE.Mesh && node.name == "Pause") {
 				scene.remove(node);
