@@ -187,6 +187,7 @@ function gameOver() {
 	texture = THREE.ImageUtils.loadTexture('game_over.jpg', {}, function() {
 	    render();
 	});
+
 	var overMaterial = new THREE.MeshBasicMaterial();
 	overMaterial.map = texture;
 	var overGeometry = new THREE.PlaneGeometry(1500, 300);
@@ -199,22 +200,63 @@ function gameOver() {
 
 function pauseGame() {
 
-	pause = true;
+	if (!pause) {
+		pause = true;
 
-	console.log("Pause");
+		console.log("Pause");
 
-	texture = THREE.ImageUtils.loadTexture('paused.jpg', {}, function() {
-		render();
-	});
-	var pauseMaterial = new THREE.MeshBasicMaterial();
-	pauseMaterial.map = texture;
-	var pauseGeometry = new THREE.PlaneGeometry(1500, 300);
-	var pauseMesh   = new THREE.Mesh( pauseGeometry, pauseMaterial);
-	pauseMesh.translateY( 200 );
-	pauseMesh.translateZ( 10);
-	pauseMesh.name = "Pause";
-	scene.add( pauseMesh );
+		texture = THREE.ImageUtils.loadTexture('paused.jpg', {}, function() {
+			render();
+		});
 
+		var pauseMaterial = new THREE.MeshBasicMaterial();
+		pauseMaterial.map = texture;
+		var pauseGeometry = new THREE.PlaneGeometry(1500, 300);
+		var pauseMesh   = new THREE.Mesh( pauseGeometry, pauseMaterial);
+		pauseMesh.translateY( 200 );
+		pauseMesh.translateZ( 10);
+		pauseMesh.name = "Pause";
+		scene.add( pauseMesh );
+		
+	} else {
+
+		scene.traverse(function (node) {
+			if (node instanceof THREE.Mesh && node.name == "Pause") {
+				scene.remove(node);
+			}
+		});
+		pause = false;
+
+		// Calculate delta time
+		t = new Date().getTime();
+		animate();
+	}
+
+}
+
+function restartGame() {
+
+	var i;
+
+	// Delete all objects from the scene
+	for(i=0; i < scene.children.length; i++){
+		obj = scene.children[i];
+		scene.remove(obj);
+	}
+	for(i=0; i < sceneLives.children.length; i++){
+		obj = sceneLives.children[i];
+		sceneLives.remove(obj);
+	}
+
+	// Restore counters
+	alienCount = 0;
+	numLives = 3;
+	pause = false;
+
+	// Recreate the scene
+	createSceneLives();
+	createScene();
+	animate();
 }
 
 // Keyboard events Reading
@@ -276,39 +318,12 @@ function onKeyDown(e){
 
 		case 82: // R
 		case 114: // r
-			var i;
-			for(i=0; i < scene.children.length; i++){
- 				obj = scene.children[i];
- 				scene.remove(obj);
-			}
-			for(i=0; i < sceneLives.children.length; i++){
- 				obj = sceneLives.children[i];
- 				sceneLives.remove(obj);
-			}
-			alienCount = 0;
-			numLives = 3;
-			pause = false;
-			createSceneLives();
-			createScene();
-			animate();
+			restartGame();
 			break;
 
 		case 83:
 		case 115:
-			if (pause) {
-				scene.traverse(function (node) {
-					if (node instanceof THREE.Mesh && node.name == "Pause") {
-						scene.remove(node);
-					}
-				});
-				pause = false;
-
-				// Calculate delta time
-				t = new Date().getTime();
-				animate();
-			} else {
-				pauseGame();
-			}
+			pauseGame();
 			break;
 
 		case 67: // C
@@ -335,10 +350,6 @@ function onKeyDown(e){
 
 		case 51: // 3
 			currentCamera = perspectiveCamera2;
-			break;
-
-		case 52: // 4
-			gameOver();
 			break;
 	}
 }
