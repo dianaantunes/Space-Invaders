@@ -32,7 +32,7 @@ function onResize(){
 
 function render(){
 	renderer.clear();
-	renderer.setViewport(0, 0, 100, window.innerHeight);	
+	renderer.setViewport(0, 0, 100, window.innerHeight);
 	renderer.setScissor(0, 0, 100, window.innerWidth );
 	renderer.setScissorTest(true);
 	renderer.render(scene, ortographicCamera2);
@@ -82,7 +82,7 @@ function createOrtographicCamera2(){
 
 function createPerspectiveCamera1() {
 
-	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
+	perspectiveCamera1 = new THREE.PerspectiveCamera(60, aspectRatio, 1, 10000);
 
 	perspectiveCamera1.position.x = 0;
 	perspectiveCamera1.position.y = -70;
@@ -93,7 +93,7 @@ function createPerspectiveCamera1() {
 
 function createPerspectiveCamera2() {
 
-	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 1000);
+	perspectiveCamera2 = new THREE.PerspectiveCamera(90, aspectRatio, 1, 10000);
 
 	perspectiveCamera2.position.x = 0;
 	perspectiveCamera2.position.y = -70;
@@ -117,6 +117,8 @@ function createSpotlight() {
 
 function createScene(){
 
+  pause = false;
+
   directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
   directionalLight.position.set( 0, 0, 50);
 
@@ -124,22 +126,25 @@ function createScene(){
   makeLives(numLives);
   ship = new Ship(0,0,0);
   makeSKiller();
-  
 
   scene.add(directionalLight);
   makePointLight();
   createSpotlight();
 
-  var geometry = new THREE.PlaneGeometry( 2560, 1440);
-  var material = new THREE.MeshBasicMaterial();
-  var mesh    = new THREE.Mesh( geometry, material);
-
   var loader = new THREE.TextureLoader();
-  mesh.material.map = loader.load('galaxy.jpg');
+  var texture = loader.load("galaxy.jpg");
+  var material = new THREE.MeshBasicMaterial();
+  material.map = texture;
 
-  scene.mesh = mesh;
+  var geometry = new THREE.PlaneGeometry( 3500, 2498);
+  sceneMesh    = new THREE.Mesh( geometry, material);
+
+  sceneMesh.translateY( height );
+  sceneMesh.rotateX( Math.PI / 6);
+  scene.add( sceneMesh );
+
   scene.add(ship);
-  scene.add( scene.mesh);
+
 }
 
 function shootBullet() {
@@ -171,8 +176,38 @@ function switchMaterial() {
 
 function gameOver() {
 
-	var loader = new THREE.TextureLoader();
-	scene.mesh.material.map = loader.load('gameover.jpg');
+	pause = true;
+
+	texture = THREE.ImageUtils.loadTexture('gameover.jpg', {}, function() {
+	    render();
+	});
+	var overMaterial = new THREE.MeshBasicMaterial();
+	overMaterial.map = texture;
+	var overGeometry = new THREE.PlaneGeometry(800, 600);
+	var over   = new THREE.Mesh( overGeometry, overMaterial);
+	over.translateY( 200 );
+	over.translateZ( 10);
+	scene.add( over );
+
+}
+
+function pauseGame() {
+
+	pause = true;
+
+	console.log("Pause");
+
+	texture = THREE.ImageUtils.loadTexture('paused.jpg', {}, function() {
+		render();
+	});
+	var pauseMaterial = new THREE.MeshBasicMaterial();
+	pauseMaterial.map = texture;
+	var pauseGeometry = new THREE.PlaneGeometry(800, 600);
+	var pauseMesh   = new THREE.Mesh( pauseGeometry, pauseMaterial);
+	pauseMesh.translateY( 200 );
+	pauseMesh.translateZ( 10);
+	pauseMesh.name = "Pause";
+	scene.add( pauseMesh );
 
 }
 
@@ -233,6 +268,38 @@ function onKeyDown(e){
 			});
 			break;
 
+		case 82: // R
+		case 114: // r
+			var i;
+			for(i=0; i < scene.children.length; i++){
+ 				obj = scene.children[i];
+ 				scene.remove(obj);
+			}
+			alienCount = 0;
+			numLives = 3;
+			pause = false;
+			createScene();
+			animate();
+			break;
+
+		case 83:
+		case 115:
+			if (pause) {
+				scene.traverse(function (node) {
+					if (node instanceof THREE.Mesh && node.name == "Pause") {
+						scene.remove(node);
+					}
+				});
+				pause = false;
+
+				// Calculate delta time
+				t = new Date().getTime();
+				animate();
+			} else {
+				pauseGame();
+			}
+			break;
+
 		case 67: // C
 		case 99: // c
 			scene.traverse(function (node) {
@@ -288,50 +355,52 @@ function animate() {
 	var now, delta;
 	var toRemove = [null, null];
 
-	// Calculate delta time
-	now = new Date().getTime();
-	delta = now - t;
-	t = now;
+	if (!pause) {
+		// Calculate delta time
+		now = new Date().getTime();
+		delta = now - t;
+		t = now;
 
-	// Shoot the bullet
-	if (shooting) shootBullet();
+		// Shoot the bullet
+		if (shooting) shootBullet();
 
-	// Traverse the scene to update movements
-	scene.traverse(function (node) {
-		if (node instanceof SKiller ||
-			node instanceof Bullet ||
-			node instanceof Ship) {
-			if(!toRemove[0] && !toRemove[1]) {
-				// If there was no bullet colision already on this iteration
-				tentative_pos = node.move(delta);
-				toRemove = node.detectCollision(node, tentative_pos);
+		// Traverse the scene to update movements
+		scene.traverse(function (node) {
+			if (node instanceof SKiller ||
+				node instanceof Bullet ||
+				node instanceof Ship) {
+				if(!toRemove[0] && !toRemove[1]) {
+					// If there was no bullet colision already on this iteration
+					tentative_pos = node.move(delta);
+					toRemove = node.detectCollision(node, tentative_pos);
+				}
 			}
-		}
-	})
+		})
 
-	if(toRemove[0] || toRemove[1]) {
-		// toRemove[0] has a value if a bullet left the scene or hit an alien
-		// or an alien hit the ship
-		scene.remove(toRemove[0]);
-		if(toRemove[1]){
-			// toRemove[1] has a value if a bullet  hit an alien
-			scene.remove(toRemove[1]);
-			alienCount--;
+		if(toRemove[0] || toRemove[1]) {
+			// toRemove[0] has a value if a bullet left the scene or hit an alien
+			// or an alien hit the ship
+			scene.remove(toRemove[0]);
+			if(toRemove[1]){
+				// toRemove[1] has a value if a bullet  hit an alien
+				scene.remove(toRemove[1]);
+				alienCount--;
+			}
+			toRemove = [null, null]; // Restart the vector for the next iteration
 		}
-		toRemove = [null, null]; // Restart the vector for the next iteration
-	}
-	if (!alienCount || !numLives){ // if there are no more aliens or lives, it's gameover
-		gameOver();
-	}
+		if (!alienCount || !numLives){ // if there are no more aliens or lives, it's gameover
+			gameOver();
+		}
 
-	//XXX workaround for the collisiondetection 
-	// of ship vs wall doesnt let ships past the wall 
-	for (var i = 0; i < numLives; i++){
-		Lives[i].position.x = -900; 
+		//XXX workaround for the collisiondetection
+		// of ship vs wall doesnt let ships past the wall
+		for (var i = 0; i < numLives; i++){
+			Lives[i].position.x = -900;
+		}
+		perspectiveCamera1.position.x = ship.position.x;
+		render();
+		requestAnimationFrame(animate);
 	}
-	perspectiveCamera1.position.x = ship.position.x;
-	render();
-	requestAnimationFrame(animate);
 }
 
 function init(){

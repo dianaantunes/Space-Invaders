@@ -11,6 +11,7 @@ var scene, renderer;
 var geometry, mesh;
 var ship, bullet;
 var t;
+var pause;
 
 var pointLight;
 
