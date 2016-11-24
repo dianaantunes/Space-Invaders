@@ -7,11 +7,10 @@
 ============================================================================================================*/
 
 var currentCamera, ortographicCamera, perspectiveCamera1, perspectiveCamera2, ortographicCamera2;
-var scene, renderer;
+var scene, renderer, sceneLives;
 var geometry, mesh;
 var ship, bullet;
 var t;
-var pause;
 
 var pointLight;
 
@@ -21,6 +20,7 @@ var lastShot = new Date().getTime();
 var shooting = 0;
 
 var aspectRatio, viewSize = 900;
+var viewSizeLives = 60;
 
 var width = 1000;
 var height = 600;
@@ -43,3 +43,5 @@ const MINBULLETTIME = 300;
 var alienCount = 0;
 var numLives = 3;
 var Lives;
+
+const LIVES_CUT = 20;

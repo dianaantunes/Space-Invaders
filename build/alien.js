@@ -182,7 +182,7 @@ SKiller.prototype.detectCollision = function(self, tentative_pos) {
 		}
 		if (node instanceof Ship) {
 			if ( checkLimits(self, node, tentative_pos) ) {
-				toRemove[0] = Lives[--numLives]; //send the life/'ship' to remove and decrement numLives
+				sceneLives.remove(Lives[--numLives]); //remove life from scene and decrement numLives
 				toRemove[1] = self;
 			}
 		}

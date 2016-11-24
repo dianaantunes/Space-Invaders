@@ -120,15 +120,14 @@ function addCockpit(obj, x, y, z){
 // Create the lives from instances of ship
 function makeLives(numLives){
 	Lives = [numLives];
-	var posX = -1000;
-	var posY = 600;
+	var posY = 0;
+
 
 	for (var i = 0; i < numLives; i++){
 		Lives[i] = new Ship(0, 0, 0);
-		Lives[i].position.x = posX;
+		Lives[i].position.x = 0;
 		Lives[i].position.y = posY;
-		posY -= 100;
-		scene.add(Lives[i]);
+		posY -= 100;	
 	}
 }
 
